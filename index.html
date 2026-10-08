@@ -1,0 +1,1729 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>श्री संत सखाराम महाराज संस्थान — व्यवस्थापन प्रणाली</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css" onerror="document.documentElement.classList.add('icons-fallback')">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<style>
+  /* Fallback glyphs if the icon-font CDN can't be reached (keeps the app usable offline) */
+  .icons-fallback i.ti{font-style:normal;font-family:inherit;}
+  .icons-fallback i.ti::before{content:"•";}
+  .icons-fallback i.ti-eye::before{content:"👁";}
+  .icons-fallback i.ti-pencil::before{content:"✎";}
+  .icons-fallback i.ti-printer::before{content:"🖶";}
+  .icons-fallback i.ti-download::before{content:"⬇";}
+  .icons-fallback i.ti-trash::before{content:"🗑";}
+  .icons-fallback i.ti-plus::before{content:"+";}
+  .icons-fallback i.ti-home::before{content:"⌂";}
+  .icons-fallback i.ti-user::before,.icons-fallback i.ti-user-plus::before,.icons-fallback i.ti-users::before{content:"👤";}
+  .icons-fallback i.ti-receipt::before,.icons-fallback i.ti-receipt-2::before{content:"🧾";}
+  .icons-fallback i.ti-flame::before{content:"🔥";}
+  .icons-fallback i.ti-list-details::before{content:"≡";}
+  .icons-fallback i.ti-chart-bar::before{content:"📊";}
+  .icons-fallback i.ti-currency-rupee::before{content:"₹";}
+  .icons-fallback i.ti-database::before{content:"⛁";}
+  .icons-fallback i.ti-settings::before{content:"⚙";}
+  .icons-fallback i.ti-search::before{content:"🔍";}
+  .icons-fallback i.ti-language::before{content:"अ";}
+  .icons-fallback i.ti-moon::before{content:"☾";}
+  .icons-fallback i.ti-menu-2::before{content:"≡";}
+  .icons-fallback i.ti-arrow-left::before{content:"←";}
+  .icons-fallback i.ti-calendar-event::before{content:"📅";}
+  .icons-fallback i.ti-device-floppy::before{content:"💾";}
+  .icons-fallback i.ti-filter::before{content:"▽";}
+  .icons-fallback i.ti-file-type-pdf::before{content:"PDF";font-size:0.7em;}
+  .icons-fallback i.ti-file-spreadsheet::before{content:"XLS";font-size:0.7em;}
+  .icons-fallback i.ti-circle-check::before{content:"✓";}
+  .icons-fallback i.ti-alert-triangle::before{content:"⚠";}
+  .icons-fallback i.ti-info-circle::before{content:"ℹ";}
+  .icons-fallback i.ti-qrcode::before{content:"▦";}
+  .icons-fallback i.ti-trending-up::before{content:"↑";}
+  .icons-fallback i.ti-trending-down::before{content:"↓";}
+  .icons-fallback i.ti-wallet::before{content:"👛";}
+  .icons-fallback i.ti-flower::before{content:"❀";}
+</style>
+<style>
+  :root{
+    --kesari:#C2410C;
+    --kesari-light:#EA580C;
+    --kesari-tint:#FBEBE0;
+    --gold:#B08D32;
+    --bg:#FAF9F6;
+    --surface:#FFFFFF;
+    --text:#1F2937;
+    --muted:#6B7280;
+    --border:#EDE6DC;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Noto Sans Devanagari','Noto Sans',sans-serif;background:var(--bg);color:var(--text);display:flex;min-height:100vh;}
+  .serif{font-family:'Noto Serif Devanagari','Noto Serif',serif;}
+  ::selection{background:var(--kesari-tint);}
+
+  /* ===== SIDEBAR ===== */
+  .sidebar{width:250px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;transition:transform .2s;}
+  .sidebar-header{padding:22px 20px 18px;border-bottom:1px solid var(--border);text-align:center;}
+  .sidebar-header .shri{color:var(--kesari);font-size:14px;font-weight:600;margin-bottom:4px;}
+  .sidebar-header .inst-name{font-size:16px;font-weight:600;color:var(--kesari);line-height:1.35;}
+  .sidebar-header .place{font-size:12px;color:var(--muted);margin-top:4px;}
+  .nav{padding:12px 10px;flex:1;overflow-y:auto;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:7px;font-size:14px;color:var(--text);text-decoration:none;margin-bottom:2px;cursor:pointer;}
+  .nav-item i{font-size:17px;color:var(--muted);width:18px;}
+  .nav-item:hover{background:var(--kesari-tint);}
+  .nav-item.active{background:var(--kesari);color:#fff;}
+  .nav-item.active i{color:#FDE9DC;}
+  .sidebar-footer{padding:12px 10px;border-top:1px solid var(--border);}
+  .menu-toggle{display:none;}
+
+  /* ===== MAIN ===== */
+  .main{flex:1;display:flex;flex-direction:column;min-width:0;}
+
+  .hero-banner{
+    background:linear-gradient(90deg,var(--kesari) 0%,var(--kesari-light) 100%);
+    padding:16px 28px;
+    display:flex;align-items:center;justify-content:space-between;
+    position:sticky;top:0;z-index:6;
+  }
+  .hero-left{display:flex;align-items:center;gap:14px;}
+  .hero-avatar{width:48px;height:48px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--kesari);flex-shrink:0;border:2px solid rgba(255,255,255,0.6);}
+  .hero-text .hname{color:#fff;font-size:16px;font-weight:600;line-height:1.3;}
+  .hero-text .hsub{color:rgba(255,255,255,0.85);font-size:12px;margin-top:1px;}
+  .hero-actions{display:flex;align-items:center;gap:10px;}
+  .hero-pill{
+    height:34px;padding:0 14px;border-radius:8px;font-size:13px;font-weight:500;
+    display:flex;align-items:center;gap:6px;cursor:pointer;
+    background:rgba(255,255,255,0.16);color:#fff;border:1px solid rgba(255,255,255,0.35);
+  }
+  .hero-pill:hover{background:rgba(255,255,255,0.26);}
+  .hero-icon-btn{
+    width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+    background:rgba(255,255,255,0.16);color:#fff;border:1px solid rgba(255,255,255,0.35);cursor:pointer;
+  }
+  .hero-icon-btn:hover{background:rgba(255,255,255,0.26);}
+  .hero-cta{
+    height:34px;padding:0 16px;border-radius:8px;font-size:13px;font-weight:600;
+    display:flex;align-items:center;gap:6px;cursor:pointer;
+    background:#fff;color:var(--kesari);border:none;
+  }
+  .hero-cta:hover{background:#FFF3EA;}
+  .menu-toggle-wrap{display:none;}
+
+  .subheader{padding:20px 30px 0;display:flex;align-items:center;justify-content:space-between;}
+  .subheader .page-title{font-size:19px;font-weight:600;color:var(--kesari);}
+  .subheader .page-sub{font-size:12.5px;color:var(--muted);margin-top:2px;}
+
+  .content{padding:18px 30px 50px;}
+  .page-section{display:none;}
+  .page-section.active{animation:fadeInUp .35s ease;}
+  @keyframes fadeInUp{ from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+  .page-section.active{display:block;}
+
+  /* ===== CARDS ===== */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:22px;}
+  .card{background:var(--surface);border:1px solid var(--border);border-top:3px solid var(--kesari);border-radius:10px;padding:16px 18px;box-shadow:0 1px 2px rgba(194,65,12,0.05);transition:transform .18s ease, box-shadow .18s ease;}
+  .card:hover{transform:translateY(-3px);box-shadow:0 10px 24px rgba(194,65,12,0.12);}
+  .card-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--kesari-tint);color:var(--kesari);font-size:17px;box-shadow:inset 0 0 0 1px rgba(194,65,12,0.08);}
+  .card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .card.gold .card-icon{background:#F8F1E2;color:var(--gold);}
+  .card.accent-green{border-top-color:#16A34A;}
+  .card.accent-green .card-icon{background:#E7F7ED;color:#16A34A;}
+  .card.accent-red{border-top-color:#DC2626;}
+  .card.accent-red .card-icon{background:#FBE9E9;color:#DC2626;}
+  .card.accent-yellow{border-top-color:#D97706;}
+  .card.accent-yellow .card-icon{background:#FDF1DC;color:#D97706;}
+  .card.accent-blue{border-top-color:#2563EB;}
+  .card.accent-blue .card-icon{background:#E7EEFC;color:#2563EB;}
+  .card.accent-purple{border-top-color:#7C3AED;}
+  .card.accent-purple .card-icon{background:#F1E9FC;color:#7C3AED;}
+  .card.accent-green .card-value{color:#16A34A;}
+  .card.accent-red .card-value{color:#DC2626;}
+  .card.accent-yellow .card-value{color:#D97706;}
+  .card.accent-blue .card-value{color:#2563EB;}
+  .card.accent-purple .card-value{color:#7C3AED;}
+  .card-value{font-size:24px;font-weight:600;color:var(--kesari);}
+  .card-label{font-size:13px;color:var(--muted);margin-top:3px;}
+
+  .section-title{font-size:15px;font-weight:600;color:var(--text);margin:26px 0 12px;display:flex;align-items:center;justify-content:space-between;}
+
+  .charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:22px;}
+  .chart-panel{margin-bottom:0;}
+  .chart-box{padding:16px 18px 20px;height:230px;position:relative;}
+  @media (max-width:900px){ .charts-row{grid-template-columns:1fr;} }
+
+  .quick-actions{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;}
+  .qa-btn{background:var(--surface);border:1px solid var(--border);border-radius:9px;padding:14px;display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:500;color:var(--text);}
+  .qa-btn:hover{border-color:var(--kesari);background:#FFFAF6;}
+  .qa-btn i{font-size:18px;color:var(--kesari);}
+  .qa-btn.primary{background:var(--kesari);color:#fff;border-color:var(--kesari);}
+  .qa-btn.primary i{color:#FDE9DC;}
+
+  /* ===== PANEL / TABLE ===== */
+  .panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:22px;}
+  .panel-header{padding:14px 18px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
+  .panel-header .title{font-size:15px;font-weight:600;color:var(--kesari);}
+  .panel-header a, .link{font-size:13px;color:var(--gold);text-decoration:none;font-weight:500;cursor:pointer;}
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  thead th{text-align:left;padding:12px 18px;background:#FBF7F2;color:var(--muted);font-weight:600;font-size:12.5px;border-bottom:1px solid var(--border);white-space:nowrap;position:sticky;top:0;z-index:2;}
+  thead th.num{text-align:right;}
+  tbody td{padding:13px 18px;border-bottom:1px solid #F3EFE9;color:var(--text);}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:nth-child(even){background:#FDFCFA;}
+  tbody tr:hover{background:#FFF3E8;}
+  td.amount{text-align:right;font-weight:600;color:var(--kesari);}
+  td.muted{color:var(--muted);}
+  .table-wrap{overflow-x:auto;max-height:520px;overflow-y:auto;}
+
+  .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:500;}
+  .badge.paid{background:#EAF6EC;color:#1E7A34;}
+  .badge.pending{background:#FDF1E3;color:#946600;}
+
+  .row-actions{display:flex;gap:4px;justify-content:center;}
+  .row-action{
+    width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;
+    color:var(--muted);cursor:pointer;border:1px solid transparent;font-size:14px;
+  }
+  .row-action:hover{background:var(--kesari-tint);color:var(--kesari);border-color:var(--border);}
+  .row-action.danger:hover{background:#FBE9E9;color:#DC2626;}
+
+  .profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+  .pf-label{font-size:12px;color:var(--muted);margin-bottom:3px;}
+  .pf-value{font-size:15px;font-weight:600;color:var(--text);}
+  #pfId.pf-value{color:var(--kesari);}
+  @media (max-width:900px){ .profile-grid{grid-template-columns:1fr 1fr;} }
+
+  /* ===== FORMS ===== */
+  .form-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;overflow:hidden;max-width:900px;}
+  .form-section{padding:22px 26px;border-bottom:1px solid var(--border);}
+  .form-section:last-of-type{border-bottom:none;}
+  .form-section h2{font-size:16px;font-weight:600;color:var(--kesari);margin-bottom:16px;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .field{display:flex;flex-direction:column;gap:6px;position:relative;}
+  .field label{font-size:13px;color:var(--muted);font-weight:500;display:flex;align-items:center;gap:6px;}
+  .field label .tag{font-size:10.5px;background:var(--kesari-tint);color:var(--kesari);padding:1px 7px;border-radius:10px;font-weight:600;}
+  .field input,.field select{height:46px;border:1px solid var(--border);border-radius:7px;padding:0 14px;font-size:14px;font-family:inherit;color:var(--text);background:var(--surface);}
+  .field input:focus,.field select:focus{outline:none;border-color:var(--kesari);box-shadow:0 0 0 3px rgba(194,65,12,0.10);}
+  .field input::placeholder{color:#B0AFA8;}
+  .field.full{grid-column:1 / -1;}
+
+  .form-actions{padding:18px 26px;display:flex;justify-content:flex-end;gap:10px;background:#FFFAF6;}
+  .btn{height:44px;padding:0 20px;border-radius:7px;font-size:14px;font-weight:500;cursor:pointer;border:1px solid var(--border);display:inline-flex;align-items:center;gap:6px;transition:transform .15s ease, box-shadow .15s ease;}
+  .btn:active{transform:scale(0.97);}
+  .btn-primary:hover{box-shadow:0 6px 16px rgba(194,65,12,0.28);transform:translateY(-1px);}
+  .btn-gold:hover{box-shadow:0 6px 16px rgba(176,141,50,0.22);transform:translateY(-1px);}
+  .qa-btn{transition:transform .15s ease, box-shadow .15s ease;}
+  .qa-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(194,65,12,0.10);}
+  .btn-secondary{background:var(--surface);color:var(--text);}
+  .btn-secondary:hover{background:var(--kesari-tint);}
+  .btn-primary{background:var(--kesari);border-color:var(--kesari);color:#fff;}
+  .btn-primary:hover{background:var(--kesari-light);}
+  .btn-gold{background:#FFFFFF;border-color:var(--gold);color:#7A5F1F;}
+  .btn-gold:hover{background:#FBF4E4;}
+
+  .translit-hint{font-size:11.5px;color:var(--muted);margin-top:4px;display:flex;align-items:center;gap:4px;}
+  .translit-hint i{color:var(--kesari);font-size:13px;}
+
+  /* ===== RECEIPT (premium) ===== */
+  .receipt-actions{display:flex;justify-content:center;padding:16px 0 0;}
+  .receipt-wrap{display:flex;justify-content:center;padding:20px 0 40px;}
+  .receipt{
+    position:relative;width:620px;background:
+      radial-gradient(circle at 50% 0%, #FFFDF9 0%, #FFFFFF 60%);
+    border:1px solid var(--gold);
+    outline:3px double var(--gold);
+    outline-offset:-8px;
+    padding:0 44px 36px;
+    box-shadow:0 14px 40px rgba(176,141,50,0.20), 0 2px 6px rgba(0,0,0,0.06);
+    overflow:hidden;
+    border-radius:2px;
+  }
+  .r-ribbon{
+    height:8px;margin:0 -44px 32px;
+    background:linear-gradient(90deg,var(--gold),var(--kesari) 50%,var(--gold));
+  }
+  .r-seal{
+    position:absolute;top:22px;right:36px;width:64px;height:64px;border-radius:50%;
+    border:2px dashed var(--gold);display:flex;align-items:center;justify-content:center;
+    transform:rotate(-12deg);opacity:0.9;z-index:1;
+  }
+  .r-seal-inner{width:52px;height:52px;border-radius:50%;border:1px solid var(--gold);display:flex;flex-direction:column;align-items:center;justify-content:center;color:#7A5F1F;}
+  .r-seal-inner .t1{font-size:8px;font-weight:600;letter-spacing:0.5px;}
+  .r-seal-inner .t2{font-size:6.5px;font-weight:600;letter-spacing:0.3px;margin-top:1px;}
+  .r-corner{position:absolute;width:26px;height:26px;border:2px solid var(--gold);opacity:0.8;}
+  .r-corner.tl{top:14px;left:14px;border-right:none;border-bottom:none;}
+  .r-corner.tr{top:14px;right:14px;border-left:none;border-bottom:none;}
+  .r-corner.bl{bottom:14px;left:14px;border-right:none;border-top:none;}
+  .r-corner.br{bottom:14px;right:14px;border-left:none;border-top:none;}
+  .r-watermark{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-14deg);
+    font-size:170px;color:var(--kesari);opacity:0.035;font-weight:600;pointer-events:none;
+  }
+  .r-header{text-align:center;margin-bottom:6px;position:relative;z-index:1;}
+  .r-emblem{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--kesari),var(--kesari-light));color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 10px;box-shadow:0 2px 8px rgba(194,65,12,0.3);}
+  .r-header .shri{color:var(--gold);font-size:13px;font-weight:600;margin-bottom:5px;letter-spacing:1px;}
+  .r-header .inst{font-size:21px;font-weight:600;color:var(--kesari);}
+  .r-header .place{font-size:12px;color:var(--muted);margin-top:3px;letter-spacing:0.3px;}
+  .r-divider-orn{display:flex;align-items:center;gap:10px;margin:18px 0 22px;color:var(--gold);position:relative;z-index:1;}
+  .r-divider-orn span{flex:1;height:1px;background:linear-gradient(90deg,transparent,#EADFC4,#EADFC4,transparent);}
+  .r-divider-orn i{font-size:15px;}
+  .r-divider-orn.small{margin:26px 0 14px;}
+  .r-title{text-align:center;font-size:18px;font-weight:600;color:var(--kesari);letter-spacing:1px;margin-bottom:22px;position:relative;z-index:1;}
+  .r-meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin-bottom:20px;position:relative;z-index:1;}
+  .r-meta .val{color:var(--text);font-weight:600;}
+  .r-row{display:flex;justify-content:space-between;padding:9px 0;border-bottom:1px dashed var(--border);font-size:14px;position:relative;z-index:1;}
+  .r-row .label{color:var(--muted);}
+  .r-row .value{font-weight:600;color:var(--text);}
+  .r-amount-box{
+    margin-top:20px;padding:18px 22px;border-radius:10px;text-align:center;position:relative;z-index:1;
+    background:linear-gradient(135deg,var(--kesari-tint) 0%,#FFF7EE 60%,#FFFCF5 100%);
+    border:1px solid var(--gold);
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.8), 0 3px 10px rgba(176,141,50,0.12);
+  }
+  .r-amount-label{font-size:12px;color:#7A5F1F;font-weight:600;letter-spacing:1px;margin-bottom:5px;text-transform:uppercase;}
+  .r-amount-value{font-size:32px;font-weight:700;color:var(--kesari);letter-spacing:0.5px;text-shadow:0 1px 0 rgba(255,255,255,0.6);}
+  .r-footer{display:flex;justify-content:space-between;align-items:flex-end;margin-top:30px;position:relative;z-index:1;}
+  .qr-box{width:66px;height:66px;border:1.5px solid var(--gold);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:26px;color:var(--gold);background:#FFFDF8;}
+  .sign-line{width:140px;border-top:1px solid #999;margin-bottom:5px;}
+  .sign-label{font-size:11px;color:var(--muted);text-align:right;}
+  .r-thanks{text-align:center;font-size:12px;color:var(--muted);margin-top:4px;font-style:italic;position:relative;z-index:1;}
+  @media print{
+    .sidebar,.hero-banner,.subheader,.receipt-actions{display:none !important;}
+    body{background:#fff;}
+    .receipt{box-shadow:none;}
+  }
+
+  /* ===== TOAST ===== */
+  .toast{
+    position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
+    background:#1F2937;color:#fff;padding:12px 22px;border-radius:8px;font-size:13.5px;
+    box-shadow:0 6px 20px rgba(0,0,0,0.2);opacity:0;pointer-events:none;transition:opacity .25s, transform .25s;
+    display:flex;align-items:center;gap:8px;z-index:100;
+  }
+  .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+  .toast i{color:#4ADE80;}
+
+  /* ===== MODAL (reliable confirm/info dialog) ===== */
+  .modal-overlay{
+    position:fixed;inset:0;background:rgba(31,25,20,0.5);z-index:200;
+    display:flex;align-items:center;justify-content:center;padding:20px;
+    animation:fadeInUp .15s ease;
+  }
+  .modal-box{
+    background:var(--surface);border-radius:12px;max-width:420px;width:100%;
+    padding:28px 26px 22px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.25);
+  }
+  .modal-icon{width:52px;height:52px;border-radius:50%;background:#FBE9E9;color:#DC2626;
+    display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 14px;}
+  .modal-icon.info{background:var(--kesari-tint);color:var(--kesari);}
+  .modal-msg{font-size:14.5px;color:var(--text);line-height:1.6;margin-bottom:22px;white-space:pre-line;}
+  .modal-actions{display:flex;gap:10px;justify-content:center;}
+  .modal-actions .btn{flex:1;justify-content:center;}
+
+  /* ===== TRANSLITERATION DROPDOWN ===== */
+  .translit-dropdown{
+    position:absolute;top:100%;left:0;margin-top:4px;
+    background:var(--surface);border:1px solid var(--kesari);border-radius:8px;
+    box-shadow:0 6px 18px rgba(194,65,12,0.15);
+    padding:6px;display:none;z-index:15;min-width:100%;
+  }
+  .translit-dropdown.show{display:block;}
+  .translit-suggestion{
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+    padding:8px 10px;border-radius:6px;cursor:pointer;font-size:15px;color:var(--text);
+  }
+  .translit-suggestion:hover, .translit-suggestion.sel{background:var(--kesari-tint);}
+  .translit-suggestion .src{font-size:11px;color:var(--muted);}
+  .translit-hint2{font-size:11px;color:var(--muted);padding:4px 10px 2px;border-top:1px solid var(--border);margin-top:4px;}
+
+  /* ===== REPORT ===== */
+  .report-header{text-align:center;margin-bottom:18px;}
+  .report-header .inst{font-size:18px;font-weight:600;color:var(--kesari);}
+  .report-header .rtitle{font-size:15px;font-weight:600;margin-top:4px;color:var(--text);}
+  .report-filters{display:flex;gap:24px;justify-content:center;font-size:13px;color:var(--muted);margin-bottom:18px;}
+  .report-filters .val{color:var(--text);font-weight:500;}
+  .report-total{padding:14px 18px;text-align:right;font-size:15px;font-weight:600;color:var(--kesari);background:#FFFAF6;border-top:1px solid var(--border);}
+  .report-toolbar{display:flex;align-items:flex-end;gap:14px;flex-wrap:wrap;padding:18px 22px;}
+  .report-toolbar .field label{margin-bottom:2px;}
+  .report-toolbar select{height:46px;border:1px solid var(--border);border-radius:7px;padding:0 12px;font-size:13.5px;font-family:inherit;background:var(--surface);color:var(--text);}
+
+  /* ===== ACCOUNTS ===== */
+  .summary-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:22px;}
+
+  /* ===== BACKUP / SETTINGS ===== */
+  .simple-panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:26px;max-width:640px;}
+  .simple-panel h2{font-size:16px;font-weight:600;color:var(--kesari);margin-bottom:14px;}
+  .simple-panel p{font-size:13.5px;color:var(--muted);margin-bottom:18px;line-height:1.6;}
+  .backup-info{display:flex;justify-content:space-between;padding:12px 0;border-top:1px solid var(--border);font-size:13.5px;}
+  .backup-info .label{color:var(--muted);}
+  .backup-info .value{font-weight:500;}
+
+  .empty-state{text-align:center;padding:50px 20px;color:var(--muted);}
+  .empty-state i{font-size:34px;color:var(--kesari);margin-bottom:10px;display:block;}
+
+  @media (max-width:900px){
+    .sidebar{position:fixed;left:0;top:0;bottom:0;z-index:20;transform:translateX(-100%);}
+    .sidebar.open{transform:translateX(0);box-shadow:0 0 40px rgba(0,0,0,0.2);}
+    .menu-toggle{display:flex;}
+    .cards,.quick-actions,.grid-2,.summary-row{grid-template-columns:repeat(2,1fr) !important;}
+    .content{padding:18px 16px 40px;}
+    .receipt{width:100%;padding:24px 20px;}
+  }
+</style>
+</head>
+<body>
+
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-header">
+    <div class="shri">॥ श्री ॥</div>
+    <div class="inst-name serif">श्री संत सखाराम<br>महाराज संस्थान</div>
+    <div class="place">अमळनेर</div>
+  </div>
+  <nav class="nav">
+    <div class="nav-item active" data-page="dashboard"><i class="ti ti-home"></i>डॅशबोर्ड</div>
+    <div class="nav-item" data-page="yajaman"><i class="ti ti-user"></i>यजमान</div>
+    <div class="nav-item" data-page="donation"><i class="ti ti-receipt"></i>देणगी</div>
+    <div class="nav-item" data-page="chaturmas"><i class="ti ti-flame"></i>चातुर्मास</div>
+    <div class="nav-item" data-page="index"><i class="ti ti-list-details"></i>INDEX</div>
+    <div class="nav-item" data-page="reports"><i class="ti ti-chart-bar"></i>अहवाल</div>
+    <div class="nav-item" data-page="accounts"><i class="ti ti-currency-rupee"></i>हिशोब</div>
+  </nav>
+  <div class="sidebar-footer">
+    <div class="nav-item" data-page="backup"><i class="ti ti-database"></i>बॅकअप</div>
+    <div class="nav-item" data-page="settings"><i class="ti ti-settings"></i>सेटिंग्ज</div>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="hero-banner">
+    <div class="hero-left">
+      <div class="hero-icon-btn menu-toggle" id="menuToggle"><i class="ti ti-menu-2"></i></div>
+      <div class="hero-avatar"><i class="ti ti-flame"></i></div>
+      <div class="hero-text">
+        <div class="hname serif">श्री संत सखाराम महाराज संस्थान, अमळनेर</div>
+        <div class="hsub">देणगी व यजमान व्यवस्थापन प्रणाली</div>
+      </div>
+    </div>
+    <div class="hero-actions">
+      <div class="hero-pill"><i class="ti ti-language"></i>मराठी</div>
+      <div class="hero-icon-btn"><i class="ti ti-moon"></i></div>
+      <button class="hero-cta" onclick="goTo('donation')"><i class="ti ti-plus"></i>नवीन देणगी</button>
+    </div>
+  </header>
+
+  <div class="subheader">
+    <div>
+      <div class="page-title serif" id="pageTitle">डॅशबोर्ड</div>
+      <div class="page-sub">श्री संत सखाराम महाराज संस्थान, अमळनेर</div>
+    </div>
+    <div class="topbar-actions">
+      <div class="icon-btn"><i class="ti ti-search"></i></div>
+      <div class="icon-btn"><i class="ti ti-database"></i></div>
+      <div class="avatar">FD</div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- ================= DASHBOARD ================= -->
+    <section class="page-section active" id="page-dashboard">
+      <div class="cards">
+        <div class="card accent-green"><div class="card-top"><div class="card-icon"><i class="ti ti-currency-rupee"></i></div></div><div class="card-value" id="statTodayAmount">₹1,25,700</div><div class="card-label">आजची देणगी</div></div>
+        <div class="card accent-blue"><div class="card-top"><div class="card-icon"><i class="ti ti-receipt-2"></i></div></div><div class="card-value" id="statTodayCount">47</div><div class="card-label">आजच्या पावत्या</div></div>
+        <div class="card accent-purple"><div class="card-top"><div class="card-icon"><i class="ti ti-users"></i></div></div><div class="card-value" id="statYajamanCount">1,245</div><div class="card-label">एकूण यजमान</div></div>
+        <div class="card accent-yellow"><div class="card-top"><div class="card-icon"><i class="ti ti-flame"></i></div></div><div class="card-value">₹18,45,200</div><div class="card-label">चातुर्मास देणगी</div></div>
+      </div>
+
+      <div class="section-title">जलद कृती</div>
+      <div class="quick-actions">
+        <div class="qa-btn primary" onclick="goTo('donation')"><i class="ti ti-plus"></i>नवीन देणगी</div>
+        <div class="qa-btn" onclick="goTo('yajaman')"><i class="ti ti-user-plus"></i>नवीन यजमान</div>
+        <div class="qa-btn" onclick="goTo('receipt')"><i class="ti ti-receipt"></i>पावती</div>
+        <div class="qa-btn" onclick="goTo('index')"><i class="ti ti-list-details"></i>INDEX</div>
+      </div>
+
+      <div class="charts-row">
+        <div class="panel chart-panel">
+          <div class="panel-header"><div class="title serif">देणगी कल (अलीकडील नोंदी)</div></div>
+          <div class="chart-box"><canvas id="dashTrendChart"></canvas></div>
+        </div>
+        <div class="panel chart-panel">
+          <div class="panel-header"><div class="title serif">तिथी-निहाय देणगी</div></div>
+          <div class="chart-box"><canvas id="dashTithiChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><div class="title serif">अलीकडील देणगी</div><span class="link" onclick="goTo('donation')">सर्व पहा</span></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>पावती</th><th>यजमान</th><th>तिथी</th><th class="num">रक्कम</th></tr></thead>
+          <tbody id="dashRecentBody"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ================= YAJAMAN ================= -->
+    <section class="page-section" id="page-yajaman">
+      <div class="section-title" id="yajFormTitle">यजमान नोंदणी<span class="qa-btn primary" style="padding:9px 16px;" onclick="openNewYajamanForm()"><i class="ti ti-plus"></i>नवीन यजमान</span></div>
+
+      <div class="form-panel" id="yajamanForm" style="display:none;margin-bottom:22px;">
+        <div class="form-section">
+          <h2>यजमानाची माहिती</h2>
+          <div class="grid-2">
+            <div class="field"><label>यजमान ID</label><input type="text" id="yajId" readonly style="background:#F7F6F2;color:var(--muted);" placeholder="जतन केल्यावर आपोआप तयार होईल"></div>
+            <div class="field">
+              <label>यजमानाचे नाव <span style="color:#DC2626;">*</span> <span class="tag">EN → मराठी</span></label>
+              <input type="text" class="mr-translit" id="yajName" placeholder="इंग्रजीत टाइप करा, उदा. ajay kulkarni">
+              <div class="translit-hint"><i class="ti ti-language"></i>टाइप करताच खाली मराठी सूचना दिसेल</div>
+            </div>
+            <div class="field"><label>मोबाईल</label><input type="text" id="yajMobile" placeholder="10 अंकी मोबाईल क्रमांक"></div>
+            <div class="field"><label>गाव <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="yajVillage" placeholder="उदा. amalner"></div>
+            <div class="field"><label>तालुका <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="yajTaluka" placeholder="उदा. amalner"></div>
+            <div class="field"><label>जिल्हा</label><input type="text" id="yajDistrict" value="जळगाव"></div>
+            <div class="field"><label>पिनकोड</label><input type="text" id="yajPincode" placeholder="6 अंकी पिनकोड"></div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="toggleForm('yajamanForm')">रद्द करा</button>
+          <button class="btn btn-primary" id="yajSaveBtn" onclick="saveYajaman()"><i class="ti ti-device-floppy"></i>यजमान जतन करा</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div class="title serif">सर्व यजमान</div>
+          <input type="text" id="yajSearchBox" oninput="renderYajaman()" placeholder="ID, नाव, मोबाईल किंवा गाव शोधा" style="height:36px;border:1px solid var(--border);border-radius:7px;padding:0 12px;font-size:13px;width:230px;">
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>क्र.</th><th>ID</th><th>नाव</th><th>गाव</th><th>मोबाईल</th><th class="num">एकूण देणगी</th><th class="num">पावत्या</th><th>शेवटची देणगी</th><th style="text-align:center;">क्रिया</th></tr></thead>
+          <tbody id="yajamanTableBody"></tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ================= YAJAMAN PROFILE ================= -->
+    <section class="page-section" id="page-yajaman-profile">
+      <div class="section-title">यजमान प्रोफाइल<span class="qa-btn" style="padding:9px 16px;" onclick="goTo('yajaman')"><i class="ti ti-arrow-left"></i>यादीकडे परत</span></div>
+
+      <div class="panel" style="padding:20px 24px;margin-bottom:18px;">
+        <div class="profile-grid">
+          <div><div class="pf-label">यजमान ID</div><div class="pf-value" id="pfId">—</div></div>
+          <div><div class="pf-label">नाव</div><div class="pf-value" id="pfName">—</div></div>
+          <div><div class="pf-label">मोबाईल</div><div class="pf-value" id="pfMobile">—</div></div>
+          <div><div class="pf-label">गाव</div><div class="pf-value" id="pfVillage">—</div></div>
+          <div><div class="pf-label">तालुका</div><div class="pf-value" id="pfTaluka">—</div></div>
+          <div><div class="pf-label">जिल्हा</div><div class="pf-value" id="pfDistrict">—</div></div>
+        </div>
+      </div>
+
+      <div class="cards" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px;">
+        <div class="card accent-green"><div class="card-top"><div class="card-icon"><i class="ti ti-currency-rupee"></i></div></div><div class="card-value" id="pfTotal">₹0</div><div class="card-label">एकूण देणगी</div></div>
+        <div class="card accent-blue"><div class="card-top"><div class="card-icon"><i class="ti ti-receipt-2"></i></div></div><div class="card-value" id="pfCount">0</div><div class="card-label">एकूण पावत्या</div></div>
+        <div class="card accent-purple"><div class="card-top"><div class="card-icon"><i class="ti ti-calendar-event"></i></div></div><div class="card-value" id="pfLast" style="font-size:16px;">—</div><div class="card-label">शेवटची देणगी</div></div>
+      </div>
+
+      <div class="quick-actions" style="margin-bottom:22px;">
+        <div class="qa-btn primary" onclick="newDonationForYajaman()"><i class="ti ti-plus"></i>नवीन देणगी</div>
+        <div class="qa-btn" onclick="editYajamanFromProfile()"><i class="ti ti-pencil"></i>यजमान संपादन</div>
+        <div class="qa-btn" onclick="printYajamanLedger()"><i class="ti ti-printer"></i>पावती इतिहास प्रिंट</div>
+        <div class="qa-btn" onclick="downloadYajamanLedgerPDF()"><i class="ti ti-file-type-pdf"></i>PDF इतिहास</div>
+      </div>
+
+      <div class="panel" id="pfHistoryPanel">
+        <div class="panel-header"><div class="title serif">देणगी इतिहास</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>पावती क्र.</th><th>दिनांक</th><th>तिथी</th><th>Payment Mode</th><th class="num">रक्कम</th><th style="text-align:center;">क्रिया</th></tr></thead>
+          <tbody id="pfHistoryBody"></tbody>
+        </table></div>
+      </div>
+    </section>
+    </section>
+
+    <!-- ================= DONATION ================= -->
+    <section class="page-section" id="page-donation">
+      <div class="section-title" id="donationFormTitle">नवीन देणगी नोंद</div>
+      <div class="form-panel" style="margin-bottom:26px;">
+        <div class="form-section">
+          <h2>यजमानाची माहिती</h2>
+          <div class="grid-2">
+            <div class="field full" style="flex-direction:row;align-items:flex-end;gap:10px;">
+              <div style="flex:1;">
+                <label>यजमान ID <span class="tag" style="background:#E7EEFC;color:#2563EB;">ऐच्छिक</span></label>
+                <input type="text" id="donYajId" placeholder="उदा. YJ-000001">
+              </div>
+              <button type="button" class="btn btn-secondary" style="height:46px;" onclick="searchYajamanForDonation()"><i class="ti ti-search"></i>यजमान शोधा</button>
+            </div>
+            <div class="field full" id="donYajFoundMsg" style="display:none;font-size:12.5px;color:#1E7A34;background:#EAF6EC;padding:8px 12px;border-radius:6px;"></div>
+            <div class="field">
+              <label>यजमानाचे नाव <span style="color:#DC2626;">*</span> <span class="tag">EN → मराठी</span></label>
+              <input type="text" class="mr-translit" id="donName" placeholder="इंग्रजीत टाइप करा, उदा. sunita deshmukh">
+            </div>
+            <div class="field"><label>मोबाईल</label><input type="text" id="donMobile" placeholder="10 अंकी मोबाईल क्रमांक"></div>
+            <div class="field"><label>गाव <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="donVillage" placeholder="उदा. amalner"></div>
+            <div class="field"><label>तालुका <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="donTaluka" placeholder="उदा. amalner"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h2>देणगी तपशील</h2>
+          <div class="grid-2">
+            <div class="field"><label>तिथी</label><select id="donTithi"><option>आषाढ शु. नवमी</option><option>आषाढ शु. दशमी</option><option>आषाढ शु. एकादशी</option></select></div>
+            <div class="field"><label>दिनांक</label><input type="date" id="donDate"></div>
+            <div class="field"><label>रक्कम (₹) <span style="color:#DC2626;">*</span></label><input type="text" id="donAmount" placeholder="0.00"></div>
+            <div class="field"><label>देणगी प्रकार</label><select id="donType"><option>रोख</option><option>ऑनलाइन</option><option>चेक</option></select></div>
+            <div class="field full"><label>टीप (ऐच्छिक) <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="donNote" placeholder="अतिरिक्त माहिती इंग्रजीत टाइप करा"></div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary" onclick="clearDonationForm()">रद्द करा</button>
+          <button class="btn btn-gold" onclick="makeReceiptFromForm()"><i class="ti ti-receipt"></i>पावती तयार करा</button>
+          <button class="btn btn-primary" id="donSaveBtn" onclick="saveDonation()"><i class="ti ti-device-floppy"></i>देणगी जतन करा</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header"><div class="title serif">अलीकडील देणगी</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>पावती</th><th>यजमान</th><th>तिथी</th><th>प्रकार</th><th class="num">रक्कम</th><th style="text-align:center;">क्रिया</th></tr></thead>
+          <tbody id="donationsTableBody">
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ================= CHATURMAS / TITHI ================= -->
+    <section class="page-section" id="page-chaturmas">
+      <div class="section-title serif" style="color:var(--kesari);"><i class="ti ti-moon" style="color:var(--gold);margin-left:6px;"></i>आषाढ शुक्ल पक्ष</div>
+      <div class="panel">
+        <div class="table-wrap"><table>
+          <thead><tr><th class="num">क्र.</th><th>तिथी</th><th>दिनांक</th><th class="num">यजमान</th><th class="num">देणगी</th></tr></thead>
+          <tbody>
+            <tr><td class="muted num">1</td><td>प्रतिपदा</td><td>18 जुलै</td><td class="num">12</td><td class="amount">₹25,000</td></tr>
+            <tr><td class="muted num">2</td><td>द्वितीया</td><td>19 जुलै</td><td class="num">18</td><td class="amount">₹41,000</td></tr>
+            <tr><td class="muted num">3</td><td>तृतीया</td><td>20 जुलै</td><td class="num">9</td><td class="amount">₹14,300</td></tr>
+            <tr><td class="muted num">4</td><td>चतुर्थी</td><td>21 जुलै</td><td class="num">15</td><td class="amount">₹22,750</td></tr>
+            <tr style="background:#FFF7EE;"><td class="muted num">9</td><td style="color:var(--kesari);font-weight:600;">नवमी</td><td>26 जुलै</td><td class="num">25</td><td class="amount">₹75,000</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ================= INDEX ================= -->
+    <section class="page-section" id="page-index">
+      <div class="panel">
+        <div class="panel-header"><div class="title serif">देणगी नोंद निर्देशिका (INDEX)</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>अ.क्र.</th><th>पावती क्र.</th><th>यजमान</th><th>गाव</th><th>दिनांक</th><th class="num">रक्कम</th></tr></thead>
+          <tbody>
+            <tr><td class="muted">1</td><td class="muted">000125</td><td>अजय कुलकर्णी</td><td>अमळनेर</td><td class="muted">18 जुलै 2026</td><td class="amount">₹11,000</td></tr>
+            <tr><td class="muted">2</td><td class="muted">000126</td><td>विजय पाटील</td><td>धुळे</td><td class="muted">19 जुलै 2026</td><td class="amount">₹5,001</td></tr>
+            <tr><td class="muted">3</td><td class="muted">000127</td><td>सुनिता देशमुख</td><td>अमळनेर</td><td class="muted">20 जुलै 2026</td><td class="amount">₹21,000</td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ================= REPORTS ================= -->
+    <section class="page-section" id="page-reports">
+      <div class="panel" style="margin-bottom:0;">
+        <div class="report-toolbar">
+          <div class="field" style="min-width:130px;">
+            <label>कालावधी प्रकार</label>
+            <select id="rpPeriodType" onchange="onReportPeriodChange()">
+              <option value="all">सर्व (संपूर्ण)</option>
+              <option value="monthly" selected>मासिक</option>
+              <option value="yearly">वार्षिक</option>
+            </select>
+          </div>
+          <div class="field" id="rpMonthWrap" style="min-width:150px;">
+            <label>महिना</label>
+            <select id="rpMonth">
+              <option value="0">जानेवारी</option><option value="1">फेब्रुवारी</option><option value="2">मार्च</option>
+              <option value="3">एप्रिल</option><option value="4">मे</option><option value="5">जून</option>
+              <option value="6" selected>जुलै</option><option value="7">ऑगस्ट</option><option value="8">सप्टेंबर</option>
+              <option value="9">ऑक्टोबर</option><option value="10">नोव्हेंबर</option><option value="11">डिसेंबर</option>
+            </select>
+          </div>
+          <div class="field" id="rpYearWrap" style="min-width:110px;">
+            <label>वर्ष</label>
+            <select id="rpYear">
+              <option>2024</option><option>2025</option><option selected>2026</option><option>2027</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" style="height:46px;" onclick="generateReport()"><i class="ti ti-filter"></i>अहवाल तयार करा</button>
+          <span style="flex:1;"></span>
+          <button class="btn btn-gold" style="height:46px;" onclick="downloadReportPDF()"><i class="ti ti-file-type-pdf"></i>PDF डाउनलोड</button>
+          <button class="btn btn-secondary" style="height:46px;" onclick="downloadReportExcel()"><i class="ti ti-file-spreadsheet"></i>Excel डाउनलोड</button>
+        </div>
+      </div>
+
+      <div class="charts-row">
+        <div class="panel chart-panel">
+          <div class="panel-header"><div class="title serif">तिथी-निहाय देणगी</div></div>
+          <div class="chart-box"><canvas id="rpTithiChart"></canvas></div>
+        </div>
+        <div class="panel chart-panel">
+          <div class="panel-header"><div class="title serif">Payment Mode विभागणी</div></div>
+          <div class="chart-box"><canvas id="rpModeChart"></canvas></div>
+        </div>
+      </div>
+
+      <div class="panel" id="reportPrintArea">
+        <div style="padding:24px 26px 0;">
+          <div class="report-header">
+            <div class="inst serif">श्री संत सखाराम महाराज संस्थान, अमळनेर</div>
+            <div class="rtitle serif">देणगी अहवाल</div>
+          </div>
+          <div class="report-filters" id="rpFilterLine">
+            <div>कालावधी <span class="val" id="rpPeriodLabel">जुलै 2026</span></div>
+            <div>एकूण नोंदी <span class="val" id="rpCount">0</span></div>
+          </div>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>पावती</th><th>यजमान</th><th>गाव</th><th>तिथी</th><th>दिनांक</th><th class="num">रक्कम</th></tr></thead>
+          <tbody id="reportTableBody"></tbody>
+        </table></div>
+        <div class="report-total" id="rpTotal">एकूण देणगी: ₹0</div>
+      </div>
+    </section>
+    </section>
+
+    <!-- ================= ACCOUNTS ================= -->
+    <section class="page-section" id="page-accounts">
+      <div class="summary-row">
+        <div class="card"><div class="card-top"><div class="card-icon"><i class="ti ti-trending-up"></i></div></div><div class="card-value">₹42,15,600</div><div class="card-label">एकूण जमा (जमा)</div></div>
+        <div class="card"><div class="card-top"><div class="card-icon"><i class="ti ti-trending-down"></i></div></div><div class="card-value">₹9,84,200</div><div class="card-label">एकूण खर्च</div></div>
+        <div class="card gold"><div class="card-top"><div class="card-icon"><i class="ti ti-wallet"></i></div></div><div class="card-value">₹32,31,400</div><div class="card-label">शिल्लक</div></div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><div class="title serif">अलीकडील व्यवहार</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>दिनांक</th><th>तपशील</th><th>प्रकार</th><th class="num">रक्कम</th><th>स्थिती</th></tr></thead>
+          <tbody>
+            <tr><td class="muted">20 जुलै</td><td>देणगी - अजय कुलकर्णी</td><td class="muted">जमा</td><td class="amount">₹11,000</td><td><span class="badge paid">जमा</span></td></tr>
+            <tr><td class="muted">19 जुलै</td><td>पूजा साहित्य खरेदी</td><td class="muted">खर्च</td><td class="amount">₹3,200</td><td><span class="badge pending">प्रलंबित</span></td></tr>
+            <tr><td class="muted">18 जुलै</td><td>देणगी - विजय पाटील</td><td class="muted">जमा</td><td class="amount">₹5,001</td><td><span class="badge paid">जमा</span></td></tr>
+          </tbody>
+        </table></div>
+      </div>
+    </section>
+
+    <!-- ================= BACKUP ================= -->
+    <section class="page-section" id="page-backup">
+      <div class="simple-panel">
+        <h2>डेटा बॅकअप</h2>
+        <p>संपूर्ण डेटाबेसचा सुरक्षित बॅकअप घ्या. बॅकअप फाईल आपल्या डिव्हाइसवर सेव्ह केली जाईल.</p>
+        <button class="btn btn-primary"><i class="ti ti-database"></i>आता बॅकअप घ्या</button>
+        <div class="backup-info"><span class="label">शेवटचा बॅकअप</span><span class="value">21 ऑगस्ट 2026, 09:40 AM</span></div>
+        <div class="backup-info"><span class="label">फाईल आकार</span><span class="value">18.4 MB</span></div>
+        <div class="backup-info"><span class="label">एकूण नोंदी</span><span class="value">3,842</span></div>
+      </div>
+    </section>
+
+    <!-- ================= SETTINGS ================= -->
+    <section class="page-section" id="page-settings">
+      <div class="form-panel" style="margin-bottom:22px;">
+        <div class="form-section">
+          <h2>संस्थान माहिती</h2>
+          <div class="grid-2">
+            <div class="field full"><label>संस्थानाचे नाव</label><input type="text" value="श्री संत सखाराम महाराज संस्थान"></div>
+            <div class="field"><label>गाव</label><input type="text" value="अमळनेर"></div>
+            <div class="field"><label>जिल्हा</label><input type="text" value="जळगाव"></div>
+            <div class="field"><label>संपर्क क्रमांक</label><input type="text" placeholder="कार्यालयीन क्रमांक"></div>
+            <div class="field"><label>ईमेल</label><input type="text" placeholder="office@example.org"></div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-secondary">रद्द करा</button>
+          <button class="btn btn-primary">बदल जतन करा</button>
+        </div>
+      </div>
+
+      <div class="simple-panel" style="max-width:900px;">
+        <h2><i class="ti ti-trash" style="color:#DC2626;"></i>&nbsp; जुन्या नोंदी हटवा</h2>
+        <p>ठराविक तारखेपूर्वीच्या सर्व देणगी नोंदी कायमच्या हटवा. हटवण्यापूर्वी संबंधित यजमानांची एकूण रक्कमही आपोआप अद्ययावत होईल. <b>ही क्रिया परत करता येणार नाही</b> — आधी बॅकअप घेण्याची शिफारस आहे.</p>
+        <div class="grid-2" style="margin-bottom:16px;">
+          <div class="field"><label>या तारखेपूर्वीच्या नोंदी हटवा</label><input type="date" id="cleanupBeforeDate"></div>
+          <div class="field" style="justify-content:flex-end;flex-direction:row;align-items:flex-end;gap:10px;">
+            <button class="btn btn-secondary" onclick="downloadBackupJSON()"><i class="ti ti-download"></i>आधी बॅकअप घ्या</button>
+            <button class="btn" style="background:#DC2626;border-color:#DC2626;color:#fff;" onclick="deleteOldDonations()"><i class="ti ti-trash"></i>जुन्या नोंदी हटवा</button>
+          </div>
+        </div>
+        <div class="backup-info" style="border-top:1px solid var(--border);"><span class="label">एकूण देणगी नोंदी</span><span class="value" id="cleanupTotalCount">0</span></div>
+        <div class="backup-info"><span class="label">निवडलेल्या तारखेपूर्वीच्या नोंदी</span><span class="value" id="cleanupMatchCount">—</span></div>
+
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+          <h2 style="color:#DC2626;"><i class="ti ti-alert-triangle"></i>&nbsp; सर्व देणगी नोंदी हटवा</h2>
+          <p>यजमान माहिती कायम राहील, पण <b>सर्व देणगी नोंदी आणि पावत्या कायमच्या हटवल्या जातील.</b> हे फक्त पूर्ण नवीन सुरुवात करायची असल्यास वापरा.</p>
+          <button class="btn" style="background:#DC2626;border-color:#DC2626;color:#fff;" onclick="deleteAllDonations()"><i class="ti ti-trash"></i>सर्व देणगी नोंदी हटवा</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= YAJAMAN LEDGER (A4 print) ================= -->
+    <section class="page-section" id="page-yajledger">
+      <div class="receipt-actions"><button class="btn btn-secondary" onclick="window.print()"><i class="ti ti-printer"></i>प्रिंट करा</button></div>
+      <div class="panel" style="max-width:800px;margin:20px auto 40px;">
+        <div style="padding:24px 26px 0;">
+          <div class="report-header">
+            <div class="inst serif">श्री संत सखाराम महाराज संस्थान, अमळनेर</div>
+            <div class="rtitle serif">यजमान इतिहास (Ledger)</div>
+          </div>
+          <div class="profile-grid" style="margin:16px 0;grid-template-columns:repeat(3,1fr);">
+            <div><div class="pf-label">यजमान ID</div><div class="pf-value" id="ldId">—</div></div>
+            <div><div class="pf-label">नाव</div><div class="pf-value" id="ldName">—</div></div>
+            <div><div class="pf-label">मोबाईल</div><div class="pf-value" id="ldMobile">—</div></div>
+            <div><div class="pf-label">गाव</div><div class="pf-value" id="ldVillage">—</div></div>
+            <div><div class="pf-label">तालुका</div><div class="pf-value" id="ldTaluka">—</div></div>
+            <div><div class="pf-label">जिल्हा</div><div class="pf-value" id="ldDistrict">—</div></div>
+          </div>
+          <div class="report-filters">
+            <div>एकूण पावत्या <span class="val" id="ldCount">0</span></div>
+          </div>
+        </div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>पावती</th><th>दिनांक</th><th>तिथी</th><th>प्रकार</th><th class="num">रक्कम</th></tr></thead>
+          <tbody id="ldBody"></tbody>
+        </table></div>
+        <div class="report-total">एकूण देणगी: <span id="ldTotal">₹0</span></div>
+      </div>
+    </section>
+
+    <!-- ================= RECEIPT (linked from quick actions) ================= -->
+    <section class="page-section" id="page-receipt">
+      <div class="receipt-actions">
+        <button class="btn btn-secondary" onclick="window.print()"><i class="ti ti-printer"></i>प्रिंट करा</button>
+      </div>
+      <div class="receipt-wrap">
+        <div class="receipt">
+          <div class="r-ribbon"></div>
+          <div class="r-corner tl"></div>
+          <div class="r-corner tr"></div>
+          <div class="r-corner bl"></div>
+          <div class="r-corner br"></div>
+          <div class="r-watermark serif">श्री</div>
+          <div class="r-seal"><div class="r-seal-inner"><span class="t1">प्रमाणित</span><span class="t2">VERIFIED</span></div></div>
+
+          <div class="r-header">
+            <div class="r-emblem serif">ॐ</div>
+            <div class="shri">॥ श्री ॥</div>
+            <div class="inst serif">श्री संत सखाराम महाराज संस्थान</div>
+            <div class="place">अमळनेर, जि. जळगाव</div>
+          </div>
+
+          <div class="r-divider-orn"><span></span><i class="ti ti-flower"></i><span></span></div>
+
+          <div class="r-title serif">देणगी पावती</div>
+
+          <div class="r-meta"><div>पावती क्र. <span class="val" id="rNo">000125</span></div><div>दिनांक <span class="val" id="rDate">१८ जुलै २०२६</span></div></div>
+          <div class="r-row" id="rYajIdRow" style="display:none;"><span class="label">यजमान ID</span><span class="value" id="rYajId">—</span></div>
+
+          <div>
+            <div class="r-row"><span class="label">यजमानाचे नाव</span><span class="value" id="rName">अजय कुलकर्णी</span></div>
+            <div class="r-row"><span class="label">गाव</span><span class="value" id="rVillage">अमळनेर</span></div>
+            <div class="r-row"><span class="label">तिथी</span><span class="value" id="rTithi">आषाढ शु. नवमी</span></div>
+            <div class="r-row"><span class="label">देणगी प्रकार</span><span class="value" id="rType">रोख</span></div>
+          </div>
+
+          <div class="r-amount-box">
+            <div class="r-amount-label">एकूण देणगी</div>
+            <div class="r-amount-value" id="rAmount">₹11,000</div>
+          </div>
+
+          <div class="r-footer">
+            <div class="qr-box"><i class="ti ti-qrcode"></i></div>
+            <div><div class="sign-line"></div><div class="sign-label">अधिकृत स्वाक्षरी</div></div>
+          </div>
+
+          <div class="r-divider-orn small"><span></span><i class="ti ti-flower" style="font-size:11px;"></i><span></span></div>
+          <div class="r-thanks">आपल्या उदार देणगीबद्दल संस्थान आभारी आहे.</div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<div class="modal-overlay" id="confirmModalOverlay" style="display:none;">
+  <div class="modal-box">
+    <div class="modal-icon" id="confirmModalIcon"><i class="ti ti-alert-triangle"></i></div>
+    <div class="modal-msg" id="confirmModalMsg"></div>
+    <div class="modal-actions" id="confirmModalActions">
+      <button class="btn btn-secondary" id="confirmModalCancel">रद्द करा</button>
+      <button class="btn" id="confirmModalOk" style="background:#DC2626;border-color:#DC2626;color:#fff;">होय, हटवा</button>
+    </div>
+  </div>
+</div>
+
+
+<script>
+/* ================= NAVIGATION ================= */
+const titles = {
+  dashboard:"डॅशबोर्ड", yajaman:"यजमान", "yajaman-profile":"यजमान प्रोफाइल", donation:"देणगी", chaturmas:"चातुर्मास",
+  index:"INDEX", reports:"अहवाल", accounts:"हिशोब", backup:"Backup", settings:"Settings", receipt:"पावती", yajledger:"यजमान इतिहास"
+};
+function goTo(page){
+  document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('page-'+page).classList.add('active');
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  const navItem = document.querySelector('.nav-item[data-page="'+page+'"]');
+  if(navItem) navItem.classList.add('active');
+  document.getElementById('pageTitle').textContent = titles[page] || page;
+  document.getElementById('sidebar').classList.remove('open');
+  if(page==='settings' && typeof updateCleanupCounts==='function') updateCleanupCounts();
+}
+document.querySelectorAll('.nav-item[data-page]').forEach(item=>{
+  item.addEventListener('click', ()=> goTo(item.dataset.page));
+});
+document.getElementById('menuToggle').addEventListener('click', ()=>{
+  document.getElementById('sidebar').classList.toggle('open');
+});
+function toggleForm(id){
+  const el = document.getElementById(id);
+  el.style.display = (el.style.display==='none') ? 'block' : 'none';
+}
+
+/* ================= TOAST ================= */
+function showToast(msg){
+  const t = document.getElementById('toast');
+  t.innerHTML = '<i class="ti ti-circle-check"></i>' + msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=> t.classList.remove('show'), 2600);
+}
+
+/* ================= CUSTOM CONFIRM / INFO MODAL (more reliable than native confirm/alert) ================= */
+function showConfirmModal(message, onYes, opts){
+  opts = opts || {};
+  const overlay = document.getElementById('confirmModalOverlay');
+  const icon = document.getElementById('confirmModalIcon');
+  const msg = document.getElementById('confirmModalMsg');
+  const okBtn = document.getElementById('confirmModalOk');
+  const cancelBtn = document.getElementById('confirmModalCancel');
+  msg.textContent = message;
+  icon.className = 'modal-icon' + (opts.info ? ' info' : '');
+  icon.innerHTML = '<i class="ti ti-'+(opts.info ? 'info-circle' : 'alert-triangle')+'"></i>';
+  okBtn.textContent = opts.okLabel || 'होय, हटवा';
+  cancelBtn.style.display = opts.info ? 'none' : '';
+  overlay.style.display = 'flex';
+  const cleanup = () => {
+    overlay.style.display = 'none';
+    okBtn.onclick = null; cancelBtn.onclick = null;
+  };
+  okBtn.onclick = () => { cleanup(); if(onYes) onYes(); };
+  cancelBtn.onclick = () => { cleanup(); };
+}
+function showInfoModal(message, okLabel){
+  showConfirmModal(message, null, {info:true, okLabel: okLabel || 'ठीक आहे'});
+}
+document.getElementById('confirmModalOverlay').addEventListener('click', function(e){
+  if(e.target === this){ this.style.display='none'; }
+});
+
+/* ================= DATA STORE (persists in this browser via localStorage) ================= */
+const STORE_KEY = 'sansthan_data_v1';
+const MR_MONTHS = ['जानेवारी','फेब्रुवारी','मार्च','एप्रिल','मे','जून','जुलै','ऑगस्ट','सप्टेंबर','ऑक्टोबर','नोव्हेंबर','डिसेंबर'];
+function fmtDateMr(iso){
+  if(!iso) return '-';
+  const d = new Date(iso+'T00:00:00');
+  if(isNaN(d)) return iso;
+  return String(d.getDate()).padStart(2,'0')+' '+MR_MONTHS[d.getMonth()]+' '+d.getFullYear();
+}
+function loadStore(){
+  try{
+    const raw = localStorage.getItem(STORE_KEY);
+    if(raw) return migrateStore(JSON.parse(raw));
+  }catch(e){ console.warn('Store read failed', e); }
+  return migrateStore({
+    nextReceipt: 128,
+    donations: [
+      {no:'000125',name:'अजय कुलकर्णी',village:'अमळनेर',tithi:'आषाढ शु. नवमी',type:'रोख',amount:11000,dateISO:'2026-07-18',date:'18 जुलै 2026'},
+      {no:'000126',name:'विजय पाटील',village:'धुळे',tithi:'आषाढ शु. नवमी',type:'ऑनलाइन',amount:5001,dateISO:'2026-07-19',date:'19 जुलै 2026'},
+      {no:'000127',name:'सुनिता देशमुख',village:'अमळनेर',tithi:'आषाढ शु. दशमी',type:'रोख',amount:21000,dateISO:'2026-07-20',date:'20 जुलै 2026'}
+    ],
+    yajaman: [
+      {name:'अजय कुलकर्णी',village:'अमळनेर',mobile:'९८XXXXXXXX',total:41000},
+      {name:'विजय पाटील',village:'धुळे',mobile:'९७XXXXXXXX',total:18500},
+      {name:'सुनिता देशमुख',village:'अमळनेर',mobile:'९६XXXXXXXX',total:27300},
+      {name:'रमेश जोशी',village:'पारोळा',mobile:'९५XXXXXXXX',total:9800}
+    ]
+  });
+}
+/* ---- Migration: assign permanent Yajaman IDs, link donations by yajamanId ---- */
+function migrateStore(store){
+  store.yajaman = store.yajaman || [];
+  store.donations = store.donations || [];
+  store.nextYajaman = store.nextYajaman || 1;
+  let changed = false;
+  store.yajaman.forEach(y=>{
+    if(!y.id){
+      y.id = 'YJ-' + String(store.nextYajaman++).padStart(6,'0');
+      changed = true;
+    }
+  });
+  store.donations.forEach(d=>{
+    if(!d.yajamanId){
+      const match = store.yajaman.find(y=>y.name===d.name);
+      if(match){ d.yajamanId = match.id; changed = true; }
+    }
+  });
+  if(changed){
+    try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){}
+  }
+  return store;
+}
+let STORE = loadStore();
+function persist(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify(STORE)); }
+  catch(e){ console.warn('Store save failed', e); showToast('जतन करताना अडचण आली — ब्राउझर स्टोरेज तपासा'); }
+}
+function genYajamanId(){ return 'YJ-' + String(STORE.nextYajaman++).padStart(6,'0'); }
+
+function fmtAmt(n){ return '₹'+Number(n||0).toLocaleString('en-IN'); }
+
+/* ---- Derived stats: NEVER trust a stored total, always compute from donation records ---- */
+function donationsFor(yajamanId){
+  return STORE.donations.filter(d=>d.yajamanId===yajamanId);
+}
+function yajamanStats(yajamanId){
+  const list = donationsFor(yajamanId);
+  const total = list.reduce((s,d)=>s+Number(d.amount||0),0);
+  const sorted = list.slice().sort((a,b)=>(a.dateISO||'').localeCompare(b.dateISO||''));
+  const last = sorted.length ? sorted[sorted.length-1] : null;
+  return {total, count:list.length, lastDate: last ? last.date : '—'};
+}
+
+let editingDonationNo = null;
+let editingYajamanId = null;
+
+function renderDonations(){
+  const body = document.getElementById('donationsTableBody');
+  body.innerHTML = STORE.donations.slice().reverse().map(d=>
+    '<tr><td class="muted">'+d.no+'</td><td>'+d.name+(d.yajamanId?' <span class="muted" style="font-size:11px;">('+d.yajamanId+')</span>':'')+'</td><td>'+d.tithi+'</td><td class="muted">'+d.type+'</td><td class="amount">'+fmtAmt(d.amount)+'</td>'+
+    '<td><div class="row-actions">'+
+      '<span class="row-action" title="पहा" onclick="viewReceipt(\''+d.no+'\')"><i class="ti ti-eye"></i></span>'+
+      '<span class="row-action" title="संपादन" onclick="editDonation(\''+d.no+'\')"><i class="ti ti-pencil"></i></span>'+
+      '<span class="row-action" title="प्रिंट" onclick="printReceipt(\''+d.no+'\')"><i class="ti ti-printer"></i></span>'+
+      '<span class="row-action" title="डाउनलोड" onclick="downloadReceiptPDF(\''+d.no+'\')"><i class="ti ti-download"></i></span>'+
+      '<span class="row-action danger" title="हटवा" onclick="deleteDonation(\''+d.no+'\')"><i class="ti ti-trash"></i></span>'+
+    '</div></td></tr>'
+  ).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:24px;">अजून कोणतीही देणगी नोंद नाही</td></tr>';
+}
+function renderYajaman(){
+  const body = document.getElementById('yajamanTableBody');
+  const q = (document.getElementById('yajSearchBox')?.value || '').trim().toLowerCase();
+  let list = STORE.yajaman.slice().reverse();
+  if(q){
+    list = list.filter(y =>
+      (y.id||'').toLowerCase().includes(q) ||
+      (y.name||'').toLowerCase().includes(q) ||
+      (y.mobile||'').toLowerCase().includes(q) ||
+      (y.village||'').toLowerCase().includes(q) ||
+      (y.taluka||'').toLowerCase().includes(q)
+    );
+  }
+  body.innerHTML = list.map((y,idx)=>{
+    const st = yajamanStats(y.id);
+    return '<tr><td class="muted">'+(idx+1)+'</td>'+
+      '<td class="muted" style="font-weight:600;color:var(--kesari);">'+y.id+'</td>'+
+      '<td><span class="link" onclick="openYajamanProfile(\''+y.id+'\')">'+y.name+'</span></td>'+
+      '<td>'+y.village+'</td><td class="muted">'+(y.mobile||'-')+'</td>'+
+      '<td class="amount">'+fmtAmt(st.total)+'</td><td class="num">'+st.count+'</td><td class="muted">'+st.lastDate+'</td>'+
+      '<td><div class="row-actions">'+
+        '<span class="row-action" title="प्रोफाइल पहा" onclick="openYajamanProfile(\''+y.id+'\')"><i class="ti ti-eye"></i></span>'+
+        '<span class="row-action" title="संपादन" onclick="editYajaman(\''+y.id+'\')"><i class="ti ti-pencil"></i></span>'+
+        '<span class="row-action" title="नवीन देणगी" onclick="newDonationForYajaman(\''+y.id+'\')"><i class="ti ti-plus"></i></span>'+
+        '<span class="row-action danger" title="हटवा" onclick="deleteYajaman(\''+y.id+'\')"><i class="ti ti-trash"></i></span>'+
+      '</div></td></tr>';
+  }).join('') || '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">कोणताही यजमान सापडला नाही</td></tr>';
+}
+let dashTrendChartInst=null, dashTithiChartInst=null, rpTithiChartInst=null, rpModeChartInst=null;
+const CHART_KESARI = '#C2410C', CHART_GOLD='#B08D32';
+const CHART_PALETTE = ['#C2410C','#B08D32','#2563EB','#16A34A','#7C3AED','#D97706','#DC2626','#0891B2'];
+
+function renderDashboard(){
+  const today = STORE.donations.reduce((s,d)=>s+Number(d.amount||0),0);
+  document.getElementById('statTodayAmount').textContent = fmtAmt(today);
+  document.getElementById('statTodayCount').textContent = STORE.donations.length;
+  document.getElementById('statYajamanCount').textContent = STORE.yajaman.length.toLocaleString('en-IN');
+
+  const recentBody = document.getElementById('dashRecentBody');
+  const recent = STORE.donations.slice().reverse().slice(0,6);
+  recentBody.innerHTML = recent.map(d=>
+    '<tr><td class="muted">'+d.no+'</td><td>'+d.name+'</td><td>'+d.tithi+'</td><td class="amount">'+fmtAmt(d.amount)+'</td></tr>'
+  ).join('') || '<tr><td colspan="4" class="muted" style="text-align:center;padding:20px;">अजून कोणतीही देणगी नोंद नाही</td></tr>';
+
+  if(!window.Chart) return;
+  // Trend chart: last up to 10 donations amount over receipt sequence
+  const trend = STORE.donations.slice(-10);
+  const trendCanvas = document.getElementById('dashTrendChart');
+  if(dashTrendChartInst) dashTrendChartInst.destroy();
+  dashTrendChartInst = new Chart(trendCanvas, {
+    type:'bar',
+    data:{ labels: trend.map(d=>d.no), datasets:[{ label:'रक्कम', data: trend.map(d=>d.amount), backgroundColor: CHART_KESARI, borderRadius:4, maxBarThickness:26 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, ticks:{callback:v=>'₹'+v}} } }
+  });
+  // Tithi-wise donut
+  const tithiTotals = {};
+  STORE.donations.forEach(d=>{ tithiTotals[d.tithi] = (tithiTotals[d.tithi]||0) + Number(d.amount||0); });
+  const tithiLabels = Object.keys(tithiTotals);
+  const tithiCanvas = document.getElementById('dashTithiChart');
+  if(dashTithiChartInst) dashTithiChartInst.destroy();
+  dashTithiChartInst = new Chart(tithiCanvas, {
+    type:'doughnut',
+    data:{ labels: tithiLabels, datasets:[{ data: tithiLabels.map(t=>tithiTotals[t]), backgroundColor: CHART_PALETTE }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}}} }
+  });
+}
+function refreshAll(){ renderDonations(); renderYajaman(); renderDashboard(); }
+refreshAll();
+
+/* ---- Donation: link by Yajaman ID, save / edit / delete ---- */
+function searchYajamanForDonation(){
+  const id = document.getElementById('donYajId').value.trim().toUpperCase();
+  const msg = document.getElementById('donYajFoundMsg');
+  if(!id){ showToast('कृपया यजमान ID टाका'); return; }
+  const y = STORE.yajaman.find(x=>x.id===id);
+  if(!y){
+    msg.style.display='block'; msg.style.background='#FBE9E9'; msg.style.color='#B91C1C';
+    msg.textContent = 'हा यजमान ID सापडला नाही.';
+    return;
+  }
+  const setField=(id2,val)=>{ const el=document.getElementById(id2); el.value=val; el.dataset.committed=val; el.dataset.raw=''; };
+  setField('donName', y.name);
+  setField('donVillage', y.village);
+  setField('donTaluka', y.taluka||'');
+  document.getElementById('donMobile').value = y.mobile||'';
+  document.getElementById('donYajId').value = y.id;
+  msg.style.display='block'; msg.style.background='#EAF6EC'; msg.style.color='#1E7A34';
+  msg.textContent = 'यजमान सापडला: '+y.name+' ('+y.id+') — माहिती भरली गेली.';
+}
+function saveDonation(){
+  const name = document.getElementById('donName').value.trim();
+  const amount = document.getElementById('donAmount').value.trim();
+  if(!name || !amount){
+    showToast('कृपया यजमानाचे नाव व रक्कम भरा');
+    return;
+  }
+  const amtCheck = Number(amount);
+  if(!(amtCheck > 0)){
+    showToast('कृपया योग्य रक्कम भरा (0 पेक्षा जास्त)');
+    return;
+  }
+  const village = document.getElementById('donVillage').value.trim() || '-';
+  const tithi = document.getElementById('donTithi').value;
+  const type = document.getElementById('donType').value;
+  const mobile = document.getElementById('donMobile').value.trim();
+  const dateISO = document.getElementById('donDate').value || new Date().toISOString().slice(0,10);
+  const amt = Number(amount)||0;
+  let yajamanId = document.getElementById('donYajId').value.trim().toUpperCase() || null;
+
+  if(yajamanId && !STORE.yajaman.find(y=>y.id===yajamanId)){
+    showToast('हा यजमान ID सापडला नाही — प्रथम "यजमान शोधा" वापरा');
+    return;
+  }
+  if(!yajamanId){
+    // no ID supplied — link/create by name for backward compatibility
+    let y = STORE.yajaman.find(y=>y.name===name);
+    if(!y){ y = {id:genYajamanId(), name, village, mobile, taluka:''}; STORE.yajaman.push(y); }
+    yajamanId = y.id;
+  }
+
+  if(editingDonationNo){
+    const rec = STORE.donations.find(x=>x.no===editingDonationNo);
+    if(rec){
+      rec.name=name; rec.village=village; rec.tithi=tithi; rec.type=type; rec.amount=amt;
+      rec.dateISO=dateISO; rec.date=fmtDateMr(dateISO); rec.yajamanId=yajamanId;
+      persist(); refreshAll();
+      showToast('देणगी नोंद अद्ययावत झाली — पावती क्र. '+rec.no);
+      const savedRec = rec;
+      editingDonationNo = null;
+      document.getElementById('donationFormTitle').textContent = 'नवीन देणगी नोंद';
+      document.getElementById('donSaveBtn').innerHTML = '<i class="ti ti-device-floppy"></i>देणगी जतन करा';
+      clearDonationForm(false);
+      return savedRec;
+    }
+  }
+
+  const no = String(STORE.nextReceipt++).padStart(6,'0');
+  const record = {no, yajamanId, name, village, tithi, type, amount:amt, dateISO, date:fmtDateMr(dateISO)};
+  STORE.donations.push(record);
+  persist();
+  refreshAll();
+  showToast('देणगी यशस्वीरित्या जतन झाली — पावती क्र. '+no);
+  clearDonationForm(false);
+  return record;
+}
+function editDonation(no){
+  const rec = STORE.donations.find(x=>x.no===no);
+  if(!rec) return;
+  editingDonationNo = no;
+  document.getElementById('donationFormTitle').textContent = 'देणगी नोंद संपादन — पावती क्र. '+no;
+  document.getElementById('donSaveBtn').innerHTML = '<i class="ti ti-device-floppy"></i>बदल जतन करा';
+  const setField = (id,val)=>{ const el=document.getElementById(id); el.value=val; el.dataset.committed=val; el.dataset.raw=''; };
+  setField('donName', rec.name);
+  setField('donVillage', rec.village);
+  document.getElementById('donYajId').value = rec.yajamanId || '';
+  document.getElementById('donYajFoundMsg').style.display='none';
+  document.getElementById('donMobile').value = '';
+  document.getElementById('donTithi').value = rec.tithi;
+  document.getElementById('donType').value = rec.type;
+  document.getElementById('donAmount').value = rec.amount;
+  document.getElementById('donDate').value = rec.dateISO || '';
+  goTo('donation');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function deleteDonation(no){
+  const rec = STORE.donations.find(x=>x.no===no);
+  if(!rec) return;
+  showConfirmModal('पावती क्र. '+no+' ही देणगी नोंद कायमची हटवायची आहे का?', function(){
+    STORE.donations = STORE.donations.filter(x=>x.no!==no);
+    persist();
+    refreshAll();
+    showToast('देणगी नोंद हटवली — पावती क्र. '+no);
+  });
+}
+function clearDonationForm(toastMsg){
+  ['donName','donMobile','donVillage','donTaluka','donAmount','donNote'].forEach(id=>{
+    const el = document.getElementById(id);
+    el.value=''; el.dataset.committed=''; el.dataset.raw='';
+  });
+  document.getElementById('donDate').value='';
+  document.getElementById('donYajId').value='';
+  document.getElementById('donYajFoundMsg').style.display='none';
+  if(editingDonationNo){
+    editingDonationNo = null;
+    document.getElementById('donationFormTitle').textContent = 'नवीन देणगी नोंद';
+    document.getElementById('donSaveBtn').innerHTML = '<i class="ti ti-device-floppy"></i>देणगी जतन करा';
+  }
+  if(toastMsg!==false) showToast('फॉर्म रिकामा केला');
+}
+
+/* ---- Yajaman: register / edit / delete / search ---- */
+function openNewYajamanForm(){
+  editingYajamanId = null;
+  document.getElementById('yajFormTitle').firstChild.textContent = 'यजमान नोंदणी';
+  document.getElementById('yajSaveBtn').innerHTML = '<i class="ti ti-device-floppy"></i>यजमान जतन करा';
+  ['yajName','yajMobile','yajVillage','yajTaluka','yajPincode'].forEach(id=>{
+    const el=document.getElementById(id); el.value=''; el.dataset.committed=''; el.dataset.raw='';
+  });
+  document.getElementById('yajId').value = '';
+  document.getElementById('yajDistrict').value = 'जळगाव';
+  document.getElementById('yajamanForm').style.display='block';
+}
+function editYajaman(id){
+  const y = STORE.yajaman.find(x=>x.id===id);
+  if(!y) return;
+  editingYajamanId = id;
+  document.getElementById('yajFormTitle').firstChild.textContent = 'यजमान संपादन — '+id;
+  document.getElementById('yajSaveBtn').innerHTML = '<i class="ti ti-device-floppy"></i>बदल जतन करा';
+  const setField=(fid,val)=>{ const el=document.getElementById(fid); el.value=val||''; el.dataset.committed=val||''; el.dataset.raw=''; };
+  document.getElementById('yajId').value = y.id;
+  setField('yajName', y.name);
+  setField('yajVillage', y.village);
+  setField('yajTaluka', y.taluka);
+  document.getElementById('yajMobile').value = y.mobile||'';
+  document.getElementById('yajDistrict').value = y.district||'जळगाव';
+  document.getElementById('yajPincode').value = y.pincode||'';
+  goTo('yajaman');
+  document.getElementById('yajamanForm').style.display='block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function editYajamanFromProfile(){ if(currentProfileId) editYajaman(currentProfileId); }
+function saveYajaman(){
+  const name = document.getElementById('yajName').value.trim();
+  if(!name){ showToast('कृपया यजमानाचे नाव भरा'); return; }
+  const village = document.getElementById('yajVillage').value.trim() || '-';
+  const taluka = document.getElementById('yajTaluka').value.trim();
+  const mobile = document.getElementById('yajMobile').value.trim();
+  const district = document.getElementById('yajDistrict').value.trim();
+  const pincode = document.getElementById('yajPincode').value.trim();
+
+  if(editingYajamanId){
+    const y = STORE.yajaman.find(x=>x.id===editingYajamanId);
+    if(y){
+      y.name=name; y.village=village; y.taluka=taluka; y.mobile=mobile; y.district=district; y.pincode=pincode;
+      persist(); refreshAll();
+      showToast('यजमान माहिती अद्ययावत झाली — '+y.id);
+      editingYajamanId=null;
+      document.getElementById('yajFormTitle').firstChild.textContent='यजमान नोंदणी';
+      document.getElementById('yajSaveBtn').innerHTML='<i class="ti ti-device-floppy"></i>यजमान जतन करा';
+      toggleForm('yajamanForm');
+    }
+    return;
+  }
+
+  if(mobile){
+    const dup = STORE.yajaman.find(y=>y.mobile && y.mobile===mobile);
+    if(dup){
+      showConfirmModal('या मोबाईल क्रमांकाचा यजमान आधीच अस्तित्वात आहे: '+dup.name+' ('+dup.id+'). त्याची प्रोफाइल उघडायची का?', function(){
+        toggleForm('yajamanForm');
+        openYajamanProfile(dup.id);
+      }, {okLabel:'प्रोफाइल उघडा'});
+      return;
+    }
+  }
+  const id = genYajamanId();
+  STORE.yajaman.push({id, name, village, taluka, mobile, district, pincode});
+  persist();
+  refreshAll();
+  showToast('यजमान यशस्वीरित्या नोंदणीकृत झाला — Yajaman ID: '+id);
+  ['yajName','yajMobile','yajVillage','yajTaluka','yajPincode'].forEach(fid=>{
+    const el = document.getElementById(fid);
+    el.value=''; el.dataset.committed=''; el.dataset.raw='';
+  });
+  document.getElementById('yajId').value='';
+  toggleForm('yajamanForm');
+}
+function deleteYajaman(id){
+  const y = STORE.yajaman.find(x=>x.id===id);
+  if(!y) return;
+  const st = yajamanStats(id);
+  if(st.count > 0){
+    showInfoModal('या यजमानाच्या '+st.count+' पावत्या आहेत. प्रथम संबंधित नोंदी तपासा.');
+    return;
+  }
+  showConfirmModal(y.name+' ('+id+') हा यजमान कायमचा हटवायचा आहे का?', function(){
+    STORE.yajaman = STORE.yajaman.filter(x=>x.id!==id);
+    persist(); refreshAll();
+    showToast('यजमान हटवला');
+  });
+}
+
+/* ---- Yajaman Profile ---- */
+let currentProfileId = null;
+function openYajamanProfile(id){
+  const y = STORE.yajaman.find(x=>x.id===id);
+  if(!y) return;
+  currentProfileId = id;
+  document.getElementById('pfId').textContent = y.id;
+  document.getElementById('pfName').textContent = y.name;
+  document.getElementById('pfMobile').textContent = y.mobile || '-';
+  document.getElementById('pfVillage').textContent = y.village || '-';
+  document.getElementById('pfTaluka').textContent = y.taluka || '-';
+  document.getElementById('pfDistrict').textContent = y.district || '-';
+  const st = yajamanStats(id);
+  document.getElementById('pfTotal').textContent = fmtAmt(st.total);
+  document.getElementById('pfCount').textContent = st.count;
+  document.getElementById('pfLast').textContent = st.lastDate;
+  const body = document.getElementById('pfHistoryBody');
+  const list = donationsFor(id).slice().sort((a,b)=>(b.dateISO||'').localeCompare(a.dateISO||''));
+  body.innerHTML = list.map(d=>
+    '<tr><td class="muted">'+d.no+'</td><td>'+d.date+'</td><td>'+d.tithi+'</td><td class="muted">'+d.type+'</td><td class="amount">'+fmtAmt(d.amount)+'</td>'+
+    '<td><div class="row-actions">'+
+      '<span class="row-action" title="पहा" onclick="viewReceipt(\''+d.no+'\')"><i class="ti ti-eye"></i></span>'+
+      '<span class="row-action" title="प्रिंट" onclick="printReceipt(\''+d.no+'\')"><i class="ti ti-printer"></i></span>'+
+      '<span class="row-action" title="PDF" onclick="downloadReceiptPDF(\''+d.no+'\')"><i class="ti ti-download"></i></span>'+
+    '</div></td></tr>'
+  ).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px;">अजून कोणतीही देणगी नाही</td></tr>';
+  goTo('yajaman-profile');
+}
+function newDonationForYajaman(id){
+  const yid = id || currentProfileId;
+  goTo('donation');
+  document.getElementById('donYajId').value = yid || '';
+  if(yid) searchYajamanForDonation();
+}
+function printYajamanLedger(){
+  if(!currentProfileId) return;
+  renderYajamanLedgerPage(currentProfileId);
+  goTo('yajledger');
+  setTimeout(()=>window.print(), 250);
+}
+function renderYajamanLedgerPage(id){
+  const y = STORE.yajaman.find(x=>x.id===id);
+  if(!y) return;
+  const st = yajamanStats(id);
+  const list = donationsFor(id).slice().sort((a,b)=>(a.dateISO||'').localeCompare(b.dateISO||''));
+  document.getElementById('ldName').textContent = y.name;
+  document.getElementById('ldId').textContent = y.id;
+  document.getElementById('ldMobile').textContent = y.mobile || '-';
+  document.getElementById('ldVillage').textContent = y.village || '-';
+  document.getElementById('ldTaluka').textContent = y.taluka || '-';
+  document.getElementById('ldDistrict').textContent = y.district || '-';
+  document.getElementById('ldCount').textContent = st.count;
+  document.getElementById('ldTotal').textContent = fmtAmt(st.total);
+  document.getElementById('ldBody').innerHTML = list.map(d=>
+    '<tr><td class="muted">'+d.no+'</td><td>'+d.date+'</td><td>'+d.tithi+'</td><td class="muted">'+d.type+'</td><td class="amount">'+fmtAmt(d.amount)+'</td></tr>'
+  ).join('');
+}
+function downloadYajamanLedgerPDF(){
+  if(!currentProfileId) return;
+  const y = STORE.yajaman.find(x=>x.id===currentProfileId);
+  if(!y || !window.jspdf){ showToast('PDF लायब्ररी लोड होत आहे, पुन्हा प्रयत्न करा'); return; }
+  const st = yajamanStats(y.id);
+  const list = donationsFor(y.id).slice().sort((a,b)=>(a.dateISO||'').localeCompare(b.dateISO||''));
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+  const kesari=[194,65,12];
+  doc.setTextColor(...kesari); doc.setFontSize(15);
+  doc.text('श्री संत सखाराम महाराज संस्थान, अमळनेर', 105, 16, {align:'center'});
+  doc.setFontSize(11); doc.text('यजमान इतिहास — '+y.name+' ('+y.id+')', 105, 24, {align:'center'});
+  doc.setFontSize(9); doc.setTextColor(80,80,80);
+  doc.text('मोबाईल: '+(y.mobile||'-')+'   गाव: '+(y.village||'-')+'   तालुका: '+(y.taluka||'-'), 105, 30, {align:'center'});
+  doc.autoTable({
+    startY:36,
+    head:[['पावती','दिनांक','तिथी','प्रकार','रक्कम']],
+    body:list.map(d=>[d.no,d.date,d.tithi,d.type,fmtAmt(d.amount)]),
+    headStyles:{fillColor:[194,65,12]},
+    styles:{font:'helvetica', fontSize:9}
+  });
+  const finalY = doc.lastAutoTable.finalY || 36;
+  doc.setFontSize(11); doc.setTextColor(...kesari);
+  doc.text('एकूण देणगी: '+fmtAmt(st.total)+'  |  एकूण पावत्या: '+st.count, 200, finalY+10, {align:'right'});
+  doc.save('यजमान-इतिहास-'+y.id+'.pdf');
+  showToast('यजमान इतिहास PDF डाउनलोड झाला');
+}
+
+/* ---- Receipt population / print / download ---- */
+function fillReceipt(d){
+  document.getElementById('rNo').textContent = d.no;
+  document.getElementById('rDate').textContent = d.date;
+  document.getElementById('rName').textContent = d.name;
+  document.getElementById('rVillage').textContent = d.village;
+  document.getElementById('rTithi').textContent = d.tithi;
+  document.getElementById('rType').textContent = d.type;
+  document.getElementById('rAmount').textContent = fmtAmt(d.amount);
+  const row = document.getElementById('rYajIdRow');
+  if(d.yajamanId){ row.style.display='flex'; document.getElementById('rYajId').textContent = d.yajamanId; }
+  else{ row.style.display='none'; }
+}
+function viewReceipt(no){
+  const d = STORE.donations.find(x=>x.no===no);
+  if(d){ fillReceipt(d); goTo('receipt'); }
+}
+function printReceipt(no){
+  const d = STORE.donations.find(x=>x.no===no);
+  if(!d) return;
+  fillReceipt(d); goTo('receipt');
+  setTimeout(()=> window.print(), 250);
+}
+function makeReceiptFromForm(){
+  const record = saveDonation();
+  if(record){ fillReceipt(record); goTo('receipt'); }
+}
+function downloadReceiptPDF(no){
+  const d = STORE.donations.find(x=>x.no===no);
+  if(!d) return;
+  if(!window.jspdf){ showToast('PDF लायब्ररी लोड होत आहे, पुन्हा प्रयत्न करा'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:[100,150]});
+  const kesari=[194,65,12], gold=[176,141,50], muted=[107,114,128], dark=[31,41,55];
+  doc.setDrawColor(...gold); doc.setLineWidth(0.6);
+  doc.rect(4,4,92,142);
+  doc.setTextColor(...gold); doc.setFontSize(9); doc.text('॥ श्री ॥', 50, 14, {align:'center'});
+  doc.setTextColor(...kesari); doc.setFontSize(13); doc.text('श्री संत सखाराम महाराज संस्थान', 50, 21, {align:'center'});
+  doc.setTextColor(...muted); doc.setFontSize(8); doc.text('अमळनेर, जि. जळगाव', 50, 26, {align:'center'});
+  doc.setDrawColor(...gold); doc.line(12,30,88,30);
+  doc.setTextColor(...kesari); doc.setFontSize(11); doc.text('देणगी पावती', 50, 38, {align:'center'});
+  doc.setFontSize(8); doc.setTextColor(...muted);
+  doc.text('पावती क्र.: '+d.no, 12, 46);
+  doc.text('दिनांक: '+d.date, 88, 46, {align:'right'});
+  let y=56;
+  const rows = [['यजमानाचे नाव', d.name],['गाव', d.village],['तिथी', d.tithi],['देणगी प्रकार', d.type]];
+  doc.setFontSize(9);
+  rows.forEach(r=>{
+    doc.setTextColor(...muted); doc.text(r[0], 12, y);
+    doc.setTextColor(...dark); doc.text(String(r[1]), 88, y, {align:'right'});
+    y+=8;
+  });
+  y+=4;
+  doc.setDrawColor(...gold); doc.setFillColor(251,235,224); doc.roundedRect(12,y,76,16,2,2,'FD');
+  doc.setTextColor(120,95,31); doc.setFontSize(8); doc.text('एकूण देणगी', 50, y+6, {align:'center'});
+  doc.setTextColor(...kesari); doc.setFontSize(14); doc.text(fmtAmt(d.amount), 50, y+13, {align:'center'});
+  y+=28;
+  doc.setTextColor(...muted); doc.setFontSize(7); doc.text('आपल्या उदार देणगीबद्दल संस्थान आभारी आहे.', 50, y, {align:'center', maxWidth:80});
+  doc.save('पावती-'+d.no+'.pdf');
+  showToast('पावती PDF डाउनलोड झाली');
+}
+
+/* ---- Reports: filter, PDF, Excel ---- */
+function onReportPeriodChange(){
+  const type = document.getElementById('rpPeriodType').value;
+  document.getElementById('rpMonthWrap').style.display = (type==='monthly') ? '' : 'none';
+  document.getElementById('rpYearWrap').style.display = (type==='all') ? 'none' : '';
+}
+function currentReportFilter(){
+  const type = document.getElementById('rpPeriodType').value;
+  const month = Number(document.getElementById('rpMonth').value);
+  const year = Number(document.getElementById('rpYear').value);
+  return {type, month, year};
+}
+function filteredDonationsForReport(){
+  const f = currentReportFilter();
+  return STORE.donations.filter(d=>{
+    if(!d.dateISO) return f.type==='all';
+    const dt = new Date(d.dateISO+'T00:00:00');
+    if(f.type==='all') return true;
+    if(f.type==='yearly') return dt.getFullYear()===f.year;
+    return dt.getFullYear()===f.year && dt.getMonth()===f.month;
+  });
+}
+function generateReport(){
+  const f = currentReportFilter();
+  const list = filteredDonationsForReport();
+  const label = f.type==='all' ? 'संपूर्ण कालावधी' : f.type==='yearly' ? ('वर्ष '+f.year) : (MR_MONTHS[f.month]+' '+f.year);
+  document.getElementById('rpPeriodLabel').textContent = label;
+  document.getElementById('rpCount').textContent = list.length;
+  const body = document.getElementById('reportTableBody');
+  body.innerHTML = list.map(d=>
+    '<tr><td class="muted">'+d.no+'</td><td>'+d.name+'</td><td>'+d.village+'</td><td>'+d.tithi+'</td><td class="muted">'+d.date+'</td><td class="amount">'+fmtAmt(d.amount)+'</td></tr>'
+  ).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px;">या कालावधीत कोणतीही नोंद नाही</td></tr>';
+  const total = list.reduce((s,d)=>s+Number(d.amount||0),0);
+  document.getElementById('rpTotal').textContent = 'एकूण देणगी: '+fmtAmt(total);
+
+  if(!window.Chart) return;
+  const tithiTotals = {};
+  list.forEach(d=>{ tithiTotals[d.tithi] = (tithiTotals[d.tithi]||0) + Number(d.amount||0); });
+  const tLabels = Object.keys(tithiTotals);
+  const rpTithiCanvas = document.getElementById('rpTithiChart');
+  if(rpTithiChartInst) rpTithiChartInst.destroy();
+  rpTithiChartInst = new Chart(rpTithiCanvas, {
+    type:'bar',
+    data:{ labels:tLabels, datasets:[{ label:'रक्कम', data:tLabels.map(t=>tithiTotals[t]), backgroundColor:CHART_KESARI, borderRadius:4, maxBarThickness:30 }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}}, scales:{ y:{beginAtZero:true, ticks:{callback:v=>'₹'+v}} } }
+  });
+  const modeTotals = {};
+  list.forEach(d=>{ modeTotals[d.type] = (modeTotals[d.type]||0) + Number(d.amount||0); });
+  const mLabels = Object.keys(modeTotals);
+  const rpModeCanvas = document.getElementById('rpModeChart');
+  if(rpModeChartInst) rpModeChartInst.destroy();
+  rpModeChartInst = new Chart(rpModeCanvas, {
+    type:'doughnut',
+    data:{ labels:mLabels, datasets:[{ data:mLabels.map(m=>modeTotals[m]), backgroundColor:CHART_PALETTE }] },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}}} }
+  });
+}
+onReportPeriodChange();
+generateReport();
+
+function downloadReportPDF(){
+  const list = filteredDonationsForReport();
+  if(!window.jspdf){ showToast('PDF लायब्ररी लोड होत आहे, पुन्हा प्रयत्न करा'); return; }
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'mm', format:'a4'});
+  const kesari=[194,65,12];
+  doc.setTextColor(...kesari); doc.setFontSize(15);
+  doc.text('श्री संत सखाराम महाराज संस्थान, अमळनेर', 105, 16, {align:'center'});
+  doc.setFontSize(12); doc.text(document.getElementById('rpPeriodLabel').textContent + ' — देणगी अहवाल', 105, 24, {align:'center'});
+  doc.autoTable({
+    startY:30,
+    head:[['पावती','यजमान','गाव','तिथी','दिनांक','रक्कम']],
+    body:list.map(d=>[d.no,d.name,d.village,d.tithi,d.date,fmtAmt(d.amount)]),
+    headStyles:{fillColor:[194,65,12]},
+    styles:{font:'helvetica', fontSize:9}
+  });
+  const total = list.reduce((s,d)=>s+Number(d.amount||0),0);
+  const finalY = doc.lastAutoTable.finalY || 30;
+  doc.setFontSize(11); doc.setTextColor(...kesari);
+  doc.text('एकूण देणगी: '+fmtAmt(total), 200, finalY+10, {align:'right'});
+  doc.save('देणगी-अहवाल.pdf');
+  showToast('अहवाल PDF डाउनलोड झाला');
+}
+function downloadReportExcel(){
+  const list = filteredDonationsForReport();
+  if(!window.XLSX){ showToast('Excel लायब्ररी लोड होत आहे, पुन्हा प्रयत्न करा'); return; }
+  const rows = list.map(d=>({
+    'पावती क्र.':d.no, 'यजमान':d.name, 'गाव':d.village, 'तिथी':d.tithi, 'प्रकार':d.type, 'दिनांक':d.date, 'रक्कम':d.amount
+  }));
+  const total = list.reduce((s,d)=>s+Number(d.amount||0),0);
+  rows.push({'पावती क्र.':'', 'यजमान':'', 'गाव':'', 'तिथी':'', 'प्रकार':'', 'दिनांक':'एकूण', 'रक्कम':total});
+  const ws = XLSX.utils.json_to_sheet(rows);
+  ws['!cols'] = [{wch:12},{wch:20},{wch:16},{wch:16},{wch:10},{wch:14},{wch:12}];
+  const wb = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb, ws, 'देणगी अहवाल');
+  XLSX.writeFile(wb, 'देणगी-अहवाल.xlsx');
+  showToast('अहवाल Excel डाउनलोड झाला');
+}
+
+/* ================= MARATHI TRANSLITERATION (English → Devanagari) with suggestion dropdown ================= */
+const VOWELS = [
+  ["au","ौ","औ"],["ai","ै","ऐ"],
+  ["aa","ा","आ"],["ee","ी","ई"],["ii","ी","ई"],["oo","ू","ऊ"],["uu","ू","ऊ"],
+  ["a","","अ"],["i","ि","इ"],["u","ु","उ"],["e","े","ए"],["o","ो","ओ"]
+];
+const CONSONANTS = [
+  ["ksh","क्ष"],["dnya","ज्ञ"],["jny","ज्ञ"],["chh","छ"],
+  ["kh","ख"],["gh","घ"],["ng","ङ"],["ch","च"],["jh","झ"],["ny","ञ"],
+  ["Th","ठ"],["Dh","ढ"],["th","थ"],["dh","ध"],["ph","फ"],["bh","भ"],
+  ["sh","श"],["Sh","ष"],
+  ["k","क"],["g","ग"],["c","च"],["j","ज"],["T","ट"],["D","ड"],["N","ण"],
+  ["t","त"],["d","द"],["n","न"],["p","प"],["b","ब"],["f","फ"],["m","म"],
+  ["y","य"],["r","र"],["L","ळ"],["l","ल"],["v","व"],["w","व"],["s","स"],["h","ह"]
+];
+const ALL_TOKENS = [
+  ...CONSONANTS.map(([p,d])=>({p,type:'C',d})),
+  ...VOWELS.map(([p,m,ind])=>({p,type:'V',m,ind}))
+].sort((a,b)=>b.p.length-a.p.length);
+
+function tokenize(word){
+  let i=0, tokens=[];
+  while(i<word.length){
+    let found=null;
+    for(const tok of ALL_TOKENS){
+      if(word.substr(i,tok.p.length)===tok.p){ found=tok; break; }
+    }
+    if(found){ tokens.push(found); i+=found.p.length; }
+    else { tokens.push({type:'X', ch:word[i]}); i+=1; }
+  }
+  return tokens;
+}
+// mode: 'schwa' keeps inherent 'a' between consonant clusters (no halant unless truly doubled),
+// 'cluster' inserts halant whenever a consonant is directly followed by another consonant.
+function transliterateWord(word, mode){
+  if(!word) return '';
+  mode = mode || 'cluster';
+  const tokens = tokenize(word);
+  let out='', i=0;
+  while(i<tokens.length){
+    const tok = tokens[i];
+    if(tok.type==='C'){
+      out += tok.d;
+      const next = tokens[i+1];
+      if(next && next.type==='V'){ out += next.m; i+=2; }
+      else if(next && next.type==='C'){
+        if(mode==='cluster'){ out += '्'; }
+        i+=1;
+      } else { i+=1; }
+    } else if(tok.type==='V'){
+      out += tok.ind; i+=1;
+    } else { out += tok.ch; i+=1; }
+  }
+  return out;
+}
+function suggestionsFor(raw){
+  if(!raw) return [];
+  const a = transliterateWord(raw,'cluster');
+  const b = transliterateWord(raw,'schwa');
+  const list = [{txt:a, src:'phonetic'}];
+  if(b!==a) list.push({txt:b, src:'पर्यायी'});
+  return list;
+}
+
+function setupTranslit(input){
+  input.dataset.committed = input.value || "";
+  input.dataset.raw = "";
+
+  // build dropdown container
+  const wrap = input.parentElement;
+  wrap.style.position = 'relative';
+  const dd = document.createElement('div');
+  dd.className = 'translit-dropdown';
+  wrap.appendChild(dd);
+
+  function renderDropdown(){
+    const raw = input.dataset.raw;
+    if(!raw){ dd.classList.remove('show'); dd.innerHTML=''; return; }
+    const sugg = suggestionsFor(raw);
+    dd.innerHTML = sugg.map((s,idx)=>
+      '<div class="translit-suggestion'+(idx===0?' sel':'')+'" data-txt="'+s.txt+'">'+
+        '<span>'+ (input.dataset.committed||'') + s.txt + '</span><span class="src">'+s.src+'</span>'+
+      '</div>'
+    ).join('') + '<div class="translit-hint2">Space दाबून किंवा क्लिक करून निवडा</div>';
+    dd.classList.add('show');
+    dd.querySelectorAll('.translit-suggestion').forEach(el=>{
+      el.addEventListener('mousedown', function(ev){
+        ev.preventDefault();
+        input.dataset.committed = input.dataset.committed + el.dataset.txt + ' ';
+        input.dataset.raw='';
+        input.value = input.dataset.committed;
+        dd.classList.remove('show');
+        input.focus();
+      });
+    });
+  }
+
+  input.addEventListener('keydown', function(e){
+    if(e.key.length!==1 && e.key!=='Backspace' && e.key!=='Enter') return;
+    if(e.key===' '||e.key==='Enter'){
+      const converted = transliterateWord(input.dataset.raw,'cluster');
+      input.dataset.committed = input.dataset.committed + converted + ' ';
+      input.dataset.raw='';
+      input.value = input.dataset.committed;
+      dd.classList.remove('show');
+      if(e.key===' ') e.preventDefault();
+    } else if(e.key==='Backspace'){
+      if(input.dataset.raw.length>0){
+        input.dataset.raw = input.dataset.raw.slice(0,-1);
+        input.value = input.dataset.committed + transliterateWord(input.dataset.raw,'cluster');
+        renderDropdown();
+        e.preventDefault();
+      } else {
+        setTimeout(()=>{ input.dataset.committed = input.value; }, 0);
+      }
+    } else if(/^[a-zA-Z]$/.test(e.key)){
+      input.dataset.raw += e.key;
+      input.value = input.dataset.committed + transliterateWord(input.dataset.raw,'cluster');
+      renderDropdown();
+      e.preventDefault();
+    }
+  });
+  input.addEventListener('blur', function(){
+    setTimeout(()=>{
+      if(input.dataset.raw){
+        input.dataset.committed += transliterateWord(input.dataset.raw,'cluster');
+        input.dataset.raw='';
+        input.value = input.dataset.committed;
+      }
+      dd.classList.remove('show');
+    }, 120);
+  });
+}
+document.querySelectorAll('.mr-translit').forEach(setupTranslit);
+
+/* ================= RECORD CLEANUP / DELETE OLD RECORDS ================= */
+function updateCleanupCounts(){
+  const totalEl = document.getElementById('cleanupTotalCount');
+  const matchEl = document.getElementById('cleanupMatchCount');
+  if(!totalEl) return;
+  totalEl.textContent = STORE.donations.length;
+  const dateVal = document.getElementById('cleanupBeforeDate').value;
+  if(!dateVal){ matchEl.textContent = '—'; return; }
+  const count = STORE.donations.filter(d => d.dateISO && d.dateISO < dateVal).length;
+  matchEl.textContent = count;
+}
+const cleanupDateInput = document.getElementById('cleanupBeforeDate');
+if(cleanupDateInput) cleanupDateInput.addEventListener('input', updateCleanupCounts);
+function deleteOldDonations(){
+  const dateVal = document.getElementById('cleanupBeforeDate').value;
+  if(!dateVal){ showToast('कृपया तारीख निवडा'); return; }
+  const toDelete = STORE.donations.filter(d => d.dateISO && d.dateISO < dateVal);
+  if(toDelete.length===0){ showToast('या तारखेपूर्वी कोणतीही नोंद नाही'); return; }
+  showConfirmModal(dateVal+' पूर्वीच्या '+toDelete.length+' देणगी नोंदी कायमच्या हटवायच्या आहेत का?\nही क्रिया परत करता येणार नाही.', function(){
+    STORE.donations = STORE.donations.filter(d => !(d.dateISO && d.dateISO < dateVal));
+    persist();
+    refreshAll();
+    updateCleanupCounts();
+    showToast(toDelete.length+' जुन्या देणगी नोंदी हटवल्या');
+  });
+}
+function deleteAllDonations(){
+  if(STORE.donations.length===0){ showToast('कोणतीही देणगी नोंद नाही'); return; }
+  const typed = prompt('सर्व '+STORE.donations.length+' देणगी नोंदी कायमच्या हटवण्यासाठी खाली DELETE लिहा:');
+  if(typed !== 'DELETE'){ showToast('रद्द केले — काहीही हटवले नाही'); return; }
+  STORE.donations = [];
+  persist();
+  refreshAll();
+  updateCleanupCounts();
+  showToast('सर्व देणगी नोंदी हटवल्या');
+}
+function downloadBackupJSON(){
+  try{
+    const blob = new Blob([JSON.stringify(STORE, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'sansthan-backup-'+new Date().toISOString().slice(0,10)+'.json';
+    document.body.appendChild(a); a.click(); a.remove();
+    URL.revokeObjectURL(url);
+    showToast('बॅकअप डाउनलोड झाला');
+  }catch(e){ showToast('बॅकअप घेताना अडचण आली'); }
+}
+</script>
+
+</body>
+</html>
