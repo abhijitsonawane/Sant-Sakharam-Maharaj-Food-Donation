@@ -1,0 +1,10 @@
+{
+  "name": "sansthan-app",
+  "version": "1.0.0",
+  "description": "Donation & Yajaman management system for Shri Sant Sakharam Maharaj Sansthan, Amalner (offline-first, single-page HTML app)",
+  "private": true,
+  "scripts": {
+    "start": "npx --yes http-server . -p 8080 -o"
+  },
+  "license": "UNLICENSED"
+}

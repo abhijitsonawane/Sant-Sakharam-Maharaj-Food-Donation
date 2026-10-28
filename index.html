@@ -8,9 +8,11 @@
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Devanagari:wght@500;600&family=Noto+Sans+Devanagari:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tabler-icons/2.44.0/iconfont/tabler-icons.min.css" onerror="document.documentElement.classList.add('icons-fallback')">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js" onerror="document.documentElement.classList.add('qr-fallback')"></script>
 <style>
   /* Fallback glyphs if the icon-font CDN can't be reached (keeps the app usable offline) */
   .icons-fallback i.ti{font-style:normal;font-family:inherit;}
@@ -48,6 +50,8 @@
   .icons-fallback i.ti-trending-down::before{content:"↓";}
   .icons-fallback i.ti-wallet::before{content:"👛";}
   .icons-fallback i.ti-flower::before{content:"❀";}
+  .icons-fallback i.ti-flag-3::before{content:"⚑";}
+  .icons-fallback i.ti-mail::before{content:"✉";}
 </style>
 <style>
   :root{
@@ -182,19 +186,43 @@
   .badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:12px;font-weight:500;}
   .badge.paid{background:#EAF6EC;color:#1E7A34;}
   .badge.pending{background:#FDF1E3;color:#946600;}
+  .badge.cancelled{background:#FBE9E9;color:#B91C1C;}
+
+  tr.row-cancelled td{color:#B0A9A2;text-decoration:line-through;text-decoration-color:#D8B4A8;}
+  tr.row-cancelled td.row-actions-cell,tr.row-cancelled .row-actions{text-decoration:none;}
+  tr.row-cancelled td.amount{color:#C99A93;}
+
+  .r-cancel-stamp{
+    position:absolute;top:38%;left:50%;transform:translate(-50%,-50%) rotate(-18deg);
+    font-size:52px;font-weight:700;color:#DC2626;opacity:0.55;border:6px solid #DC2626;
+    padding:4px 22px;border-radius:8px;letter-spacing:2px;z-index:2;pointer-events:none;
+    font-family:'Noto Sans Devanagari','Noto Sans',sans-serif;text-align:center;line-height:1.15;
+  }
+  .r-cancel-stamp .en{display:block;font-size:16px;letter-spacing:4px;margin-top:2px;}
+  .qr-box{padding:2px;}
+  .qr-box img,.qr-box canvas{width:100%;height:100%;image-rendering:pixelated;}
 
   .row-actions{display:flex;gap:4px;justify-content:center;}
   .row-action{
     width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;
-    color:var(--muted);cursor:pointer;border:1px solid transparent;font-size:14px;
+    color:var(--kesari);cursor:pointer;border:1px solid var(--border);font-size:14px;
+    background:var(--kesari-tint);
   }
-  .row-action:hover{background:var(--kesari-tint);color:var(--kesari);border-color:var(--border);}
-  .row-action.danger:hover{background:#FBE9E9;color:#DC2626;}
+  .row-action:hover{background:var(--kesari);color:#fff;border-color:var(--kesari);}
+  .row-action.edit{background:#E7EEFC;color:#2563EB;border-color:#D6E2F8;}
+  .row-action.edit:hover{background:#2563EB;color:#fff;border-color:#2563EB;}
+  .row-action.danger{background:#FBE9E9;color:#DC2626;border-color:#F6D5D5;}
+  .row-action.danger:hover{background:#DC2626;color:#fff;border-color:#DC2626;}
+  .row-action.restore{background:#EAF6EC;color:#16A34A;border-color:#D4EDDB;}
+  .row-action.restore:hover{background:#16A34A;color:#fff;border-color:#16A34A;}
 
-  .profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
-  .pf-label{font-size:12px;color:var(--muted);margin-bottom:3px;}
-  .pf-value{font-size:15px;font-weight:600;color:var(--text);}
-  #pfId.pf-value{color:var(--kesari);}
+  .profile-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:20px 24px;}
+  .pf-label{font-size:11.5px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px;}
+  .pf-value{font-size:15.5px;font-weight:600;color:var(--text);}
+  #pfId.pf-value{color:var(--kesari);letter-spacing:0.3px;}
+  .pf-head-panel{position:relative;overflow:hidden;border-top:3px solid var(--gold);box-shadow:0 4px 18px rgba(176,141,50,0.10);}
+  .pf-head-panel::before{content:"";position:absolute;top:0;right:0;width:160px;height:160px;
+    background:radial-gradient(circle at 100% 0%, var(--kesari-tint) 0%, transparent 70%);pointer-events:none;}
   @media (max-width:900px){ .profile-grid{grid-template-columns:1fr 1fr;} }
 
   /* ===== FORMS ===== */
@@ -263,6 +291,20 @@
     position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-14deg);
     font-size:170px;color:var(--kesari);opacity:0.035;font-weight:600;pointer-events:none;
   }
+  .r-watermark2{
+    position:absolute;top:62%;left:50%;transform:translate(-50%,-50%) rotate(-14deg);
+    font-size:54px;color:var(--gold);opacity:0.07;font-weight:600;pointer-events:none;white-space:nowrap;
+  }
+  .r-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 24px;position:relative;z-index:1;}
+  .r-grid .r-row{font-size:13px;}
+  .sp-letter{max-width:800px;margin:20px auto 40px;background:#fff;border:1px solid var(--border);border-radius:10px;padding:40px 48px;line-height:1.9;font-size:15px;position:relative;}
+  .sp-letter .sp-top{text-align:center;font-weight:600;color:var(--kesari);margin-bottom:4px;}
+  .sp-letter .sp-inst{text-align:center;font-size:19px;font-weight:600;color:var(--kesari);margin-bottom:18px;}
+  .sp-letter .sp-sub{font-weight:600;margin:14px 0 10px;}
+  .sp-letter p{margin-bottom:12px;text-align:justify;}
+  .sp-letter .sp-bank{margin:10px 0 10px 22px;}
+  .sp-letter .sp-bank li{margin-bottom:2px;}
+  .sp-letter .sp-amt{font-weight:700;color:var(--kesari);}
   .r-header{text-align:center;margin-bottom:6px;position:relative;z-index:1;}
   .r-emblem{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--kesari),var(--kesari-light));color:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;margin:0 auto 10px;box-shadow:0 2px 8px rgba(194,65,12,0.3);}
   .r-header .shri{color:var(--gold);font-size:13px;font-weight:600;margin-bottom:5px;letter-spacing:1px;}
@@ -435,7 +477,7 @@
         <div class="card accent-green"><div class="card-top"><div class="card-icon"><i class="ti ti-currency-rupee"></i></div></div><div class="card-value" id="statTodayAmount">₹1,25,700</div><div class="card-label">आजची देणगी</div></div>
         <div class="card accent-blue"><div class="card-top"><div class="card-icon"><i class="ti ti-receipt-2"></i></div></div><div class="card-value" id="statTodayCount">47</div><div class="card-label">आजच्या पावत्या</div></div>
         <div class="card accent-purple"><div class="card-top"><div class="card-icon"><i class="ti ti-users"></i></div></div><div class="card-value" id="statYajamanCount">1,245</div><div class="card-label">एकूण यजमान</div></div>
-        <div class="card accent-yellow"><div class="card-top"><div class="card-icon"><i class="ti ti-flame"></i></div></div><div class="card-value">₹18,45,200</div><div class="card-label">चातुर्मास देणगी</div></div>
+        <div class="card accent-yellow"><div class="card-top"><div class="card-icon"><i class="ti ti-flame"></i></div></div><div class="card-value" id="statChaturmasAmount">₹0</div><div class="card-label">चातुर्मास देणगी (एकूण)</div></div>
       </div>
 
       <div class="section-title">जलद कृती</div>
@@ -485,6 +527,8 @@
             <div class="field"><label>तालुका <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="yajTaluka" placeholder="उदा. amalner"></div>
             <div class="field"><label>जिल्हा</label><input type="text" id="yajDistrict" value="जळगाव"></div>
             <div class="field"><label>पिनकोड</label><input type="text" id="yajPincode" placeholder="6 अंकी पिनकोड"></div>
+            <div class="field"><label>गोत्र <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="yajGotra" placeholder="ऐच्छिक — उदा. kashyap"></div>
+            <div class="field"><label>संकल्पित रक्कम (₹) <span class="tag" style="background:#E7EEFC;color:#2563EB;">ऐच्छिक</span></label><input type="text" id="yajPledge" placeholder="उदा. 51000 — स्मरणपत्रासाठी वापरले जाईल"></div>
           </div>
         </div>
         <div class="form-actions">
@@ -499,7 +543,7 @@
           <input type="text" id="yajSearchBox" oninput="renderYajaman()" placeholder="ID, नाव, मोबाईल किंवा गाव शोधा" style="height:36px;border:1px solid var(--border);border-radius:7px;padding:0 12px;font-size:13px;width:230px;">
         </div>
         <div class="table-wrap"><table>
-          <thead><tr><th>क्र.</th><th>ID</th><th>नाव</th><th>गाव</th><th>मोबाईल</th><th class="num">एकूण देणगी</th><th class="num">पावत्या</th><th>शेवटची देणगी</th><th style="text-align:center;">क्रिया</th></tr></thead>
+          <thead><tr><th>क्र.</th><th>ID</th><th>नाव</th><th>गाव</th><th>मोबाईल</th><th class="num">संकल्प</th><th class="num">जमा</th><th class="num">बाकी</th><th class="num">पावत्या</th><th>शेवटची देणगी</th><th style="text-align:center;">क्रिया</th></tr></thead>
           <tbody id="yajamanTableBody"></tbody>
         </table></div>
       </div>
@@ -509,36 +553,71 @@
     <section class="page-section" id="page-yajaman-profile">
       <div class="section-title">यजमान प्रोफाइल<span class="qa-btn" style="padding:9px 16px;" onclick="goTo('yajaman')"><i class="ti ti-arrow-left"></i>यादीकडे परत</span></div>
 
-      <div class="panel" style="padding:20px 24px;margin-bottom:18px;">
+      <div class="panel pf-head-panel" style="padding:22px 26px;margin-bottom:18px;">
         <div class="profile-grid">
           <div><div class="pf-label">यजमान ID</div><div class="pf-value" id="pfId">—</div></div>
           <div><div class="pf-label">नाव</div><div class="pf-value" id="pfName">—</div></div>
+          <div><div class="pf-label">गोत्र</div><div class="pf-value" id="pfGotra">—</div></div>
           <div><div class="pf-label">मोबाईल</div><div class="pf-value" id="pfMobile">—</div></div>
           <div><div class="pf-label">गाव</div><div class="pf-value" id="pfVillage">—</div></div>
           <div><div class="pf-label">तालुका</div><div class="pf-value" id="pfTaluka">—</div></div>
           <div><div class="pf-label">जिल्हा</div><div class="pf-value" id="pfDistrict">—</div></div>
+          <div><div class="pf-label">पिनकोड</div><div class="pf-value" id="pfPincode">—</div></div>
         </div>
       </div>
 
-      <div class="cards" style="grid-template-columns:repeat(3,1fr);margin-bottom:18px;">
-        <div class="card accent-green"><div class="card-top"><div class="card-icon"><i class="ti ti-currency-rupee"></i></div></div><div class="card-value" id="pfTotal">₹0</div><div class="card-label">एकूण देणगी</div></div>
+      <div class="cards" style="grid-template-columns:repeat(5,1fr);margin-bottom:18px;">
+        <div class="card accent-purple"><div class="card-top"><div class="card-icon"><i class="ti ti-flag-3"></i></div></div><div class="card-value" id="pfPledge" style="font-size:19px;">—</div><div class="card-label">संकल्पित रक्कम</div></div>
+        <div class="card accent-green"><div class="card-top"><div class="card-icon"><i class="ti ti-currency-rupee"></i></div></div><div class="card-value" id="pfTotal">₹0</div><div class="card-label">एकूण जमा</div></div>
+        <div class="card accent-red"><div class="card-top"><div class="card-icon"><i class="ti ti-alert-triangle"></i></div></div><div class="card-value" id="pfDue" style="font-size:19px;">—</div><div class="card-label">बाकी रक्कम</div></div>
         <div class="card accent-blue"><div class="card-top"><div class="card-icon"><i class="ti ti-receipt-2"></i></div></div><div class="card-value" id="pfCount">0</div><div class="card-label">एकूण पावत्या</div></div>
-        <div class="card accent-purple"><div class="card-top"><div class="card-icon"><i class="ti ti-calendar-event"></i></div></div><div class="card-value" id="pfLast" style="font-size:16px;">—</div><div class="card-label">शेवटची देणगी</div></div>
+        <div class="card accent-yellow"><div class="card-top"><div class="card-icon"><i class="ti ti-calendar-event"></i></div></div><div class="card-value" id="pfLast" style="font-size:15px;">—</div><div class="card-label">शेवटची देणगी</div></div>
       </div>
 
-      <div class="quick-actions" style="margin-bottom:22px;">
+      <div class="quick-actions" style="margin-bottom:22px;grid-template-columns:repeat(5,1fr);">
         <div class="qa-btn primary" onclick="newDonationForYajaman()"><i class="ti ti-plus"></i>नवीन देणगी</div>
         <div class="qa-btn" onclick="editYajamanFromProfile()"><i class="ti ti-pencil"></i>यजमान संपादन</div>
         <div class="qa-btn" onclick="printYajamanLedger()"><i class="ti ti-printer"></i>पावती इतिहास प्रिंट</div>
         <div class="qa-btn" onclick="downloadYajamanLedgerPDF()"><i class="ti ti-file-type-pdf"></i>PDF इतिहास</div>
+        <div class="qa-btn" onclick="openSmaranPatra()"><i class="ti ti-mail"></i>स्मरणपत्र</div>
+      </div>
+
+      <div class="panel" style="margin-bottom:0;">
+        <div class="report-toolbar">
+          <div class="field" style="min-width:130px;">
+            <label>कालावधी प्रकार</label>
+            <select id="pfPeriodType" onchange="onPfPeriodChange()">
+              <option value="all" selected>सर्व (संपूर्ण)</option>
+              <option value="monthly">मासिक</option>
+              <option value="yearly">वार्षिक</option>
+            </select>
+          </div>
+          <div class="field" id="pfMonthWrap" style="min-width:150px;display:none;">
+            <label>महिना</label>
+            <select id="pfMonth">
+              <option value="0">जानेवारी</option><option value="1">फेब्रुवारी</option><option value="2">मार्च</option>
+              <option value="3">एप्रिल</option><option value="4">मे</option><option value="5">जून</option>
+              <option value="6" selected>जुलै</option><option value="7">ऑगस्ट</option><option value="8">सप्टेंबर</option>
+              <option value="9">ऑक्टोबर</option><option value="10">नोव्हेंबर</option><option value="11">डिसेंबर</option>
+            </select>
+          </div>
+          <div class="field" id="pfYearWrap" style="min-width:110px;display:none;">
+            <label>वर्ष</label>
+            <select id="pfYear">
+              <option>2021</option><option>2022</option><option>2023</option><option>2024</option><option>2025</option><option selected>2026</option><option>2027</option><option>2028</option><option>2029</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" style="height:46px;" onclick="refreshPfHistory()"><i class="ti ti-filter"></i>फिल्टर करा</button>
+        </div>
       </div>
 
       <div class="panel" id="pfHistoryPanel">
-        <div class="panel-header"><div class="title serif">देणगी इतिहास</div></div>
+        <div class="panel-header"><div class="title serif">देणगी इतिहास</div><span class="muted" style="font-size:12.5px;" id="pfHistoryPeriodLabel">सर्व कालावधी</span></div>
         <div class="table-wrap"><table>
           <thead><tr><th>पावती क्र.</th><th>दिनांक</th><th>तिथी</th><th>Payment Mode</th><th class="num">रक्कम</th><th style="text-align:center;">क्रिया</th></tr></thead>
           <tbody id="pfHistoryBody"></tbody>
         </table></div>
+        <div class="report-total" id="pfHistoryTotal">एकूण देणगी: ₹0</div>
       </div>
     </section>
     </section>
@@ -562,25 +641,31 @@
               <label>यजमानाचे नाव <span style="color:#DC2626;">*</span> <span class="tag">EN → मराठी</span></label>
               <input type="text" class="mr-translit" id="donName" placeholder="इंग्रजीत टाइप करा, उदा. sunita deshmukh">
             </div>
-            <div class="field"><label>मोबाईल</label><input type="text" id="donMobile" placeholder="10 अंकी मोबाईल क्रमांक"></div>
+            <div class="field"><label>समर्थनार्थ (कोणाच्या वतीने) <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="donSamarth" placeholder="ऐच्छिक — उदा. दिवंगत वडिलांच्या स्मरणार्थ"></div>
+            <div class="field"><label>गोत्र <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="donGotra" placeholder="ऐच्छिक — उदा. kashyap"></div>
+            <div class="field"><label>मोबाईल १</label><input type="text" id="donMobile" placeholder="10 अंकी मोबाईल क्रमांक"></div>
+            <div class="field"><label>मोबाईल २ (ऐच्छिक)</label><input type="text" id="donMobile2" placeholder="10 अंकी पर्यायी मोबाईल क्रमांक"></div>
             <div class="field"><label>गाव <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="donVillage" placeholder="उदा. amalner"></div>
             <div class="field"><label>तालुका <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="donTaluka" placeholder="उदा. amalner"></div>
+            <div class="field"><label>जिल्हा <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="donDistrict" placeholder="उदा. jalgaon"></div>
+            <div class="field"><label>पिनकोड</label><input type="text" id="donPincode" placeholder="6 अंकी पिनकोड"></div>
           </div>
         </div>
         <div class="form-section">
           <h2>देणगी तपशील</h2>
           <div class="grid-2">
-            <div class="field"><label>तिथी</label><select id="donTithi"><option>आषाढ शु. नवमी</option><option>आषाढ शु. दशमी</option><option>आषाढ शु. एकादशी</option></select></div>
+            <div class="field"><label>तिथी</label><select id="donTithi"></select></div>
             <div class="field"><label>दिनांक</label><input type="date" id="donDate"></div>
             <div class="field"><label>रक्कम (₹) <span style="color:#DC2626;">*</span></label><input type="text" id="donAmount" placeholder="0.00"></div>
-            <div class="field"><label>देणगी प्रकार</label><select id="donType"><option>रोख</option><option>ऑनलाइन</option><option>चेक</option></select></div>
+            <div class="field"><label>देणगी प्रकार</label><select id="donType" onchange="onDonTypeChange()"><option>रोख</option><option>UPI</option><option>चेक</option></select></div>
+            <div class="field" id="donPaymentRefWrap" style="display:none;"><label id="donPaymentRefLabel">UPI संदर्भ क्र.</label><input type="text" id="donPaymentRef" placeholder="UPI Ref / Transaction ID"></div>
             <div class="field full"><label>टीप (ऐच्छिक) <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="donNote" placeholder="अतिरिक्त माहिती इंग्रजीत टाइप करा"></div>
           </div>
         </div>
         <div class="form-actions">
           <button class="btn btn-secondary" onclick="clearDonationForm()">रद्द करा</button>
-          <button class="btn btn-gold" onclick="makeReceiptFromForm()"><i class="ti ti-receipt"></i>पावती तयार करा</button>
-          <button class="btn btn-primary" id="donSaveBtn" onclick="saveDonation()"><i class="ti ti-device-floppy"></i>देणगी जतन करा</button>
+          <button class="btn btn-primary" id="donSaveBtn" onclick="saveDonation()"><i class="ti ti-device-floppy"></i>जतन करा</button>
+          <button class="btn btn-gold" onclick="finalizeDonation()"><i class="ti ti-receipt"></i>अंतिम करा व पावती</button>
         </div>
       </div>
 
@@ -596,33 +681,28 @@
 
     <!-- ================= CHATURMAS / TITHI ================= -->
     <section class="page-section" id="page-chaturmas">
-      <div class="section-title serif" style="color:var(--kesari);"><i class="ti ti-moon" style="color:var(--gold);margin-left:6px;"></i>आषाढ शुक्ल पक्ष</div>
+      <div class="section-title serif" style="color:var(--kesari);"><i class="ti ti-moon" style="color:var(--gold);margin-left:6px;"></i>तिथी-निहाय देणगी सारांश</div>
       <div class="panel">
         <div class="table-wrap"><table>
-          <thead><tr><th class="num">क्र.</th><th>तिथी</th><th>दिनांक</th><th class="num">यजमान</th><th class="num">देणगी</th></tr></thead>
-          <tbody>
-            <tr><td class="muted num">1</td><td>प्रतिपदा</td><td>18 जुलै</td><td class="num">12</td><td class="amount">₹25,000</td></tr>
-            <tr><td class="muted num">2</td><td>द्वितीया</td><td>19 जुलै</td><td class="num">18</td><td class="amount">₹41,000</td></tr>
-            <tr><td class="muted num">3</td><td>तृतीया</td><td>20 जुलै</td><td class="num">9</td><td class="amount">₹14,300</td></tr>
-            <tr><td class="muted num">4</td><td>चतुर्थी</td><td>21 जुलै</td><td class="num">15</td><td class="amount">₹22,750</td></tr>
-            <tr style="background:#FFF7EE;"><td class="muted num">9</td><td style="color:var(--kesari);font-weight:600;">नवमी</td><td>26 जुलै</td><td class="num">25</td><td class="amount">₹75,000</td></tr>
-          </tbody>
+          <thead><tr><th class="num">क्र.</th><th>तिथी</th><th>पहिली/शेवटची नोंद</th><th class="num">यजमान</th><th class="num">पावत्या</th><th class="num">देणगी</th></tr></thead>
+          <tbody id="chaturmasTableBody"></tbody>
         </table></div>
+        <div class="report-total" id="chaturmasTotal">एकूण देणगी: ₹0</div>
       </div>
     </section>
 
     <!-- ================= INDEX ================= -->
     <section class="page-section" id="page-index">
       <div class="panel">
-        <div class="panel-header"><div class="title serif">देणगी नोंद निर्देशिका (INDEX)</div></div>
+        <div class="panel-header">
+          <div class="title serif">देणगी नोंद निर्देशिका (INDEX)</div>
+          <input type="text" id="indexSearchBox" oninput="renderIndexPage()" placeholder="नाव, गाव किंवा पावती क्र. शोधा" style="height:36px;border:1px solid var(--border);border-radius:7px;padding:0 12px;font-size:13px;width:230px;">
+        </div>
         <div class="table-wrap"><table>
-          <thead><tr><th>अ.क्र.</th><th>पावती क्र.</th><th>यजमान</th><th>गाव</th><th>दिनांक</th><th class="num">रक्कम</th></tr></thead>
-          <tbody>
-            <tr><td class="muted">1</td><td class="muted">000125</td><td>अजय कुलकर्णी</td><td>अमळनेर</td><td class="muted">18 जुलै 2026</td><td class="amount">₹11,000</td></tr>
-            <tr><td class="muted">2</td><td class="muted">000126</td><td>विजय पाटील</td><td>धुळे</td><td class="muted">19 जुलै 2026</td><td class="amount">₹5,001</td></tr>
-            <tr><td class="muted">3</td><td class="muted">000127</td><td>सुनिता देशमुख</td><td>अमळनेर</td><td class="muted">20 जुलै 2026</td><td class="amount">₹21,000</td></tr>
-          </tbody>
+          <thead><tr><th>अ.क्र.</th><th>पावती क्र.</th><th>यजमान</th><th>गाव</th><th>दिनांक</th><th class="num">रक्कम</th><th>स्थिती</th></tr></thead>
+          <tbody id="indexTableBody"></tbody>
         </table></div>
+        <div class="report-total" id="indexTotal">एकूण देणगी: ₹0</div>
       </div>
     </section>
 
@@ -650,7 +730,7 @@
           <div class="field" id="rpYearWrap" style="min-width:110px;">
             <label>वर्ष</label>
             <select id="rpYear">
-              <option>2024</option><option>2025</option><option selected>2026</option><option>2027</option>
+              <option>2021</option><option>2022</option><option>2023</option><option>2024</option><option>2025</option><option selected>2026</option><option>2027</option><option>2028</option><option>2029</option>
             </select>
           </div>
           <button class="btn btn-primary" style="height:46px;" onclick="generateReport()"><i class="ti ti-filter"></i>अहवाल तयार करा</button>
@@ -688,25 +768,52 @@
         </table></div>
         <div class="report-total" id="rpTotal">एकूण देणगी: ₹0</div>
       </div>
+
+      <div class="panel" id="rpDatePanel">
+        <div class="panel-header"><div class="title serif">दिनांकनिहाय सारांश</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>दिनांक</th><th class="num">पावत्या</th><th class="num">रक्कम</th></tr></thead>
+          <tbody id="rpDateBody"></tbody>
+        </table></div>
+      </div>
+
+      <div class="panel" id="rpTithiPanel">
+        <div class="panel-header"><div class="title serif">तिथीनिहाय सारांश</div></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>तिथी</th><th class="num">पावत्या</th><th class="num">रक्कम</th></tr></thead>
+          <tbody id="rpTithiBody"></tbody>
+        </table></div>
+      </div>
     </section>
     </section>
 
     <!-- ================= ACCOUNTS ================= -->
     <section class="page-section" id="page-accounts">
       <div class="summary-row">
-        <div class="card"><div class="card-top"><div class="card-icon"><i class="ti ti-trending-up"></i></div></div><div class="card-value">₹42,15,600</div><div class="card-label">एकूण जमा (जमा)</div></div>
-        <div class="card"><div class="card-top"><div class="card-icon"><i class="ti ti-trending-down"></i></div></div><div class="card-value">₹9,84,200</div><div class="card-label">एकूण खर्च</div></div>
-        <div class="card gold"><div class="card-top"><div class="card-icon"><i class="ti ti-wallet"></i></div></div><div class="card-value">₹32,31,400</div><div class="card-label">शिल्लक</div></div>
+        <div class="card"><div class="card-top"><div class="card-icon"><i class="ti ti-trending-up"></i></div></div><div class="card-value" id="acJama">₹0</div><div class="card-label">एकूण जमा (देणगी)</div></div>
+        <div class="card"><div class="card-top"><div class="card-icon"><i class="ti ti-trending-down"></i></div></div><div class="card-value" id="acKharch">₹0</div><div class="card-label">एकूण खर्च</div></div>
+        <div class="card gold"><div class="card-top"><div class="card-icon"><i class="ti ti-wallet"></i></div></div><div class="card-value" id="acShillak">₹0</div><div class="card-label">शिल्लक</div></div>
       </div>
+
+      <div class="form-panel" style="margin-bottom:22px;">
+        <div class="form-section">
+          <h2>नवीन खर्च नोंद</h2>
+          <div class="grid-2">
+            <div class="field"><label>दिनांक</label><input type="date" id="expDate"></div>
+            <div class="field"><label>रक्कम (₹) <span style="color:#DC2626;">*</span></label><input type="text" id="expAmount" placeholder="0.00"></div>
+            <div class="field full"><label>तपशील <span style="color:#DC2626;">*</span> <span class="tag">EN → मराठी</span></label><input type="text" class="mr-translit" id="expDesc" placeholder="उदा. pooja sahitya kharedi"></div>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="saveExpense()"><i class="ti ti-device-floppy"></i>खर्च जतन करा</button>
+        </div>
+      </div>
+
       <div class="panel">
         <div class="panel-header"><div class="title serif">अलीकडील व्यवहार</div></div>
         <div class="table-wrap"><table>
-          <thead><tr><th>दिनांक</th><th>तपशील</th><th>प्रकार</th><th class="num">रक्कम</th><th>स्थिती</th></tr></thead>
-          <tbody>
-            <tr><td class="muted">20 जुलै</td><td>देणगी - अजय कुलकर्णी</td><td class="muted">जमा</td><td class="amount">₹11,000</td><td><span class="badge paid">जमा</span></td></tr>
-            <tr><td class="muted">19 जुलै</td><td>पूजा साहित्य खरेदी</td><td class="muted">खर्च</td><td class="amount">₹3,200</td><td><span class="badge pending">प्रलंबित</span></td></tr>
-            <tr><td class="muted">18 जुलै</td><td>देणगी - विजय पाटील</td><td class="muted">जमा</td><td class="amount">₹5,001</td><td><span class="badge paid">जमा</span></td></tr>
-          </tbody>
+          <thead><tr><th>दिनांक</th><th>तपशील</th><th>प्रकार</th><th class="num">रक्कम</th><th>स्थिती</th><th style="text-align:center;">क्रिया</th></tr></thead>
+          <tbody id="acTransBody"></tbody>
         </table></div>
       </div>
     </section>
@@ -729,16 +836,26 @@
         <div class="form-section">
           <h2>संस्थान माहिती</h2>
           <div class="grid-2">
-            <div class="field full"><label>संस्थानाचे नाव</label><input type="text" value="श्री संत सखाराम महाराज संस्थान"></div>
-            <div class="field"><label>गाव</label><input type="text" value="अमळनेर"></div>
-            <div class="field"><label>जिल्हा</label><input type="text" value="जळगाव"></div>
-            <div class="field"><label>संपर्क क्रमांक</label><input type="text" placeholder="कार्यालयीन क्रमांक"></div>
-            <div class="field"><label>ईमेल</label><input type="text" placeholder="office@example.org"></div>
+            <div class="field full"><label>संस्थानाचे नाव</label><input type="text" id="setInstName"></div>
+            <div class="field"><label>गाव</label><input type="text" id="setInstVillage"></div>
+            <div class="field"><label>जिल्हा</label><input type="text" id="setInstDistrict"></div>
+            <div class="field"><label>संपर्क क्रमांक</label><input type="text" id="setInstContact" placeholder="कार्यालयीन क्रमांक"></div>
+            <div class="field"><label>ईमेल</label><input type="text" id="setInstEmail" placeholder="office@example.org"></div>
+          </div>
+        </div>
+        <div class="form-section">
+          <h2>बँक तपशील (स्मरणपत्रासाठी)</h2>
+          <div class="grid-2">
+            <div class="field"><label>बँकेचे नाव</label><input type="text" id="setBankName"></div>
+            <div class="field"><label>खातेधारकाचे नाव</label><input type="text" id="setBankHolder"></div>
+            <div class="field"><label>खाते क्रमांक</label><input type="text" id="setBankAccount"></div>
+            <div class="field"><label>IFSC कोड</label><input type="text" id="setBankIFSC"></div>
+            <div class="field"><label>शाखा (Branch)</label><input type="text" id="setBankBranch"></div>
           </div>
         </div>
         <div class="form-actions">
-          <button class="btn btn-secondary">रद्द करा</button>
-          <button class="btn btn-primary">बदल जतन करा</button>
+          <button class="btn btn-secondary" onclick="loadSettingsForm()">रद्द करा</button>
+          <button class="btn btn-primary" onclick="saveSettings()"><i class="ti ti-device-floppy"></i>बदल जतन करा</button>
         </div>
       </div>
 
@@ -766,7 +883,8 @@
     <!-- ================= YAJAMAN LEDGER (A4 print) ================= -->
     <section class="page-section" id="page-yajledger">
       <div class="receipt-actions"><button class="btn btn-secondary" onclick="window.print()"><i class="ti ti-printer"></i>प्रिंट करा</button></div>
-      <div class="panel" style="max-width:800px;margin:20px auto 40px;">
+      <div class="panel" style="max-width:800px;margin:20px auto 40px;overflow:hidden;">
+        <div class="r-ribbon" style="margin:0 0 0;"></div>
         <div style="padding:24px 26px 0;">
           <div class="report-header">
             <div class="inst serif">श्री संत सखाराम महाराज संस्थान, अमळनेर</div>
@@ -781,14 +899,48 @@
             <div><div class="pf-label">जिल्हा</div><div class="pf-value" id="ldDistrict">—</div></div>
           </div>
           <div class="report-filters">
+            <div>कालावधी <span class="val" id="ldPeriodLabel">सर्व कालावधी</span></div>
             <div>एकूण पावत्या <span class="val" id="ldCount">0</span></div>
           </div>
         </div>
         <div class="table-wrap"><table>
-          <thead><tr><th>पावती</th><th>दिनांक</th><th>तिथी</th><th>प्रकार</th><th class="num">रक्कम</th></tr></thead>
+          <thead><tr><th>पावती</th><th>दिनांक</th><th>तिथी</th><th>प्रकार</th><th class="num">रक्कम</th><th>स्थिती</th></tr></thead>
           <tbody id="ldBody"></tbody>
         </table></div>
         <div class="report-total">एकूण देणगी: <span id="ldTotal">₹0</span></div>
+      </div>
+    </section>
+
+    <!-- ================= SMARAN PATRA (reminder letter) ================= -->
+    <section class="page-section" id="page-smaranpatra">
+      <div class="receipt-actions" style="gap:10px;">
+        <button class="btn btn-secondary" onclick="goTo('yajaman-profile')"><i class="ti ti-arrow-left"></i>परत</button>
+        <button class="btn btn-gold" onclick="downloadSmaranPatraPDF()"><i class="ti ti-file-type-pdf"></i>PDF डाउनलोड</button>
+        <button class="btn btn-primary" onclick="window.print()"><i class="ti ti-printer"></i>प्रिंट</button>
+      </div>
+      <div class="sp-letter" id="spLetter">
+        <div class="sp-top">॥ सद्‌गुरु प्रसन्न ॥</div>
+        <div class="sp-inst serif" id="spInst">श्री संत सखाराम महाराज संस्थान, अमळनेर</div>
+        <div><b>दिनांक:</b> <span id="spDate">—</span></div>
+        <div style="margin-top:10px;"><b>प्रति,</b></div>
+        <div><b>देणगीदाराचे नाव :</b> <span id="spName">—</span> <span id="spGotraWrap"></span></div>
+        <div><b>देणगीदाराचा पत्ता :</b> <span id="spAddr">—</span></div>
+        <div class="sp-sub">विषय: अन्नदान सेवेच्या देणगीच्या उर्वरित रकमेबाबत नम्र स्मरणपत्र.</div>
+        <p><b>जय हरी,</b></p>
+        <p>आपणास कळविण्यास येते की, <b id="spInst2">श्री संत सखाराम महाराज संस्थान, अमळनेर</b> च्या वतीने दररोज भाविक आणि गरजू लोकांसाठी अखंड अन्नदान सेवा अविरतपणे सुरू आहे. संतांनी म्हटलेच आहे – '<b>अन्न हे पूर्णब्रह्म</b>' आणि '<b>जगामध्ये अन्नदान हेच सर्वश्रेष्ठ दान आहे</b>'. या पवित्र कार्यात आपले योगदान अत्यंत मोलाचे आहे.</p>
+        <p>आपण <span id="spSamarth"></span>चातुर्मासात तिथीनुसार अन्नदान करून घेऊन, ते विधिवत पूर्ण करण्यासाठी एकूण <b class="sp-amt" id="spPledge">₹0</b> (<span id="spPledgeWords">—</span>) ची देणगी देण्याचे संकल्पित केले होते. त्यापैकी रु. <b class="sp-amt" id="spPaid">0</b>/- एवढी रक्कम आपण यापूर्वी जमा केली आहे. आपल्या संकल्पातील रु. <b class="sp-amt" id="spDue">0</b>/- एवढी रक्कम अजून येणे शिल्लक आहे.</p>
+        <p>तरी आपणास कळविण्यात येते की, ही उर्वरित रक्कम आपल्या परीने लवकरात लवकर संस्थेकडे जमा करावी, जेणेकरून आपल्या नावाने अन्नदानाचा पुढील विधी व सेवा सुरळीतपणे पार पाडण्यास संस्थानला मदत होईल. आपल्या संपूर्ण परिवाराने या पवित्र कार्यात योगदान देऊन हे महान सत्कर्म वेळेत पूर्ण करून घ्यावे, हीच सदिच्छा.</p>
+        <p>आपल्या सोयीसाठी संस्थानचा <b>बँक तपशील (Bank Details)</b> खालीलप्रमाणे आहे:</p>
+        <ul class="sp-bank">
+          <li><b>बँकेचे नाव :</b> <span id="spBankName">—</span></li>
+          <li><b>खातेधारकाचे नाव :</b> <span id="spBankHolder">—</span></li>
+          <li><b>खाते क्रमांक :</b> <span id="spBankAccount">—</span></li>
+          <li><b>आयएफएससी कोड (IFSC Code):</b> <span id="spBankIFSC">—</span></li>
+          <li><b>शाखा (Branch):</b> <span id="spBankBranch">—</span></li>
+        </ul>
+        <p style="font-size:13.5px;"><i>(टीप: आपण ऑनलाइन QR code द्वारे देखील रक्कम पाठवू शकता. रक्कम जमा केल्यावर त्याचा स्क्रीनशॉट किंवा पावती नक्की पाठवावी.)</i></p>
+        <p><b>"सद्‌गुरू कृपेने आपल्या परिवाराला सुख, समृद्धी, उत्तम आरोग्य आणि दीर्घायुष्य लाभो. आपल्या हातून असेच सत्कर्म घडत राहो हीच ईश्वरचरणी प्रार्थना."</b></p>
+        <p><b>॥ शुभ आशीर्वाद ॥</b></p>
       </div>
     </section>
 
@@ -806,6 +958,8 @@
           <div class="r-corner br"></div>
           <div class="r-watermark serif">श्री</div>
           <div class="r-seal"><div class="r-seal-inner"><span class="t1">प्रमाणित</span><span class="t2">VERIFIED</span></div></div>
+          <div class="r-watermark2 serif">समाधी मंदिर</div>
+          <div class="r-cancel-stamp" id="rCancelStamp" style="display:none;">रद्द<span class="en">CANCELLED</span></div>
 
           <div class="r-header">
             <div class="r-emblem serif">ॐ</div>
@@ -823,9 +977,17 @@
 
           <div>
             <div class="r-row"><span class="label">यजमानाचे नाव</span><span class="value" id="rName">अजय कुलकर्णी</span></div>
-            <div class="r-row"><span class="label">गाव</span><span class="value" id="rVillage">अमळनेर</span></div>
+            <div class="r-row" id="rGotraRow" style="display:none;"><span class="label">गोत्र</span><span class="value" id="rGotra">—</span></div>
+            <div class="r-row" id="rSamarthRow" style="display:none;"><span class="label">समर्थनार्थ</span><span class="value" id="rSamarth">—</span></div>
+            <div class="r-grid">
+              <div class="r-row"><span class="label">गाव</span><span class="value" id="rVillage">अमळनेर</span></div>
+              <div class="r-row"><span class="label">तालुका</span><span class="value" id="rTaluka">—</span></div>
+              <div class="r-row"><span class="label">जिल्हा</span><span class="value" id="rDistrict">—</span></div>
+              <div class="r-row"><span class="label">पिनकोड</span><span class="value" id="rPincode">—</span></div>
+            </div>
             <div class="r-row"><span class="label">तिथी</span><span class="value" id="rTithi">आषाढ शु. नवमी</span></div>
             <div class="r-row"><span class="label">देणगी प्रकार</span><span class="value" id="rType">रोख</span></div>
+            <div class="r-row" id="rRefRow" style="display:none;"><span class="label" id="rRefLabel">संदर्भ क्र.</span><span class="value" id="rRef">—</span></div>
           </div>
 
           <div class="r-amount-box">
@@ -834,7 +996,7 @@
           </div>
 
           <div class="r-footer">
-            <div class="qr-box"><i class="ti ti-qrcode"></i></div>
+            <div class="qr-box" id="rQrBox"><i class="ti ti-qrcode"></i></div>
             <div><div class="sign-line"></div><div class="sign-label">अधिकृत स्वाक्षरी</div></div>
           </div>
 
@@ -865,7 +1027,7 @@
 /* ================= NAVIGATION ================= */
 const titles = {
   dashboard:"डॅशबोर्ड", yajaman:"यजमान", "yajaman-profile":"यजमान प्रोफाइल", donation:"देणगी", chaturmas:"चातुर्मास",
-  index:"INDEX", reports:"अहवाल", accounts:"हिशोब", backup:"Backup", settings:"Settings", receipt:"पावती", yajledger:"यजमान इतिहास"
+  index:"INDEX", reports:"अहवाल", accounts:"हिशोब", backup:"Backup", settings:"Settings", receipt:"पावती", yajledger:"यजमान इतिहास", smaranpatra:"स्मरणपत्र"
 };
 function goTo(page){
   document.querySelectorAll('.page-section').forEach(s=>s.classList.remove('active'));
@@ -928,6 +1090,58 @@ document.getElementById('confirmModalOverlay').addEventListener('click', functio
 /* ================= DATA STORE (persists in this browser via localStorage) ================= */
 const STORE_KEY = 'sansthan_data_v1';
 const MR_MONTHS = ['जानेवारी','फेब्रुवारी','मार्च','एप्रिल','मे','जून','जुलै','ऑगस्ट','सप्टेंबर','ऑक्टोबर','नोव्हेंबर','डिसेंबर'];
+
+/* ---- Tithi list: आषाढ शु. नवमी  →  कार्तिक शु. पौर्णिमा ---- */
+const TITHI_NAMES = ['प्रतिपदा','द्वितीया','तृतीया','चतुर्थी','पंचमी','षष्ठी','सप्तमी','अष्टमी','नवमी','दशमी','एकादशी','द्वादशी','त्रयोदशी','चतुर्दशी'];
+const TITHI_MONTHS = ['आषाढ','श्रावण','भाद्रपद','आश्विन','कार्तिक'];
+function buildTithiGroups(){
+  const groups = [];
+  TITHI_MONTHS.forEach((m, mi)=>{
+    [['शु.','पौर्णिमा'],['कृ.','अमावास्या']].forEach(([paksha, last])=>{
+      if(mi===TITHI_MONTHS.length-1 && paksha==='कृ.') return;   // list ends at कार्तिक शु. पौर्णिमा
+      const names = TITHI_NAMES.concat([last]);
+      let items = names.map(n=> m+' '+paksha+' '+n);
+      if(mi===0 && paksha==='शु.') items = items.slice(8);        // start at आषाढ शु. नवमी
+      groups.push({label: m+' '+(paksha==='शु.'?'शुक्ल':'कृष्ण')+' पक्ष', items});
+    });
+  });
+  return groups;
+}
+const TITHI_GROUPS = buildTithiGroups();
+const ALL_TITHIS = TITHI_GROUPS.reduce((a,g)=>a.concat(g.items),[]);
+function populateTithiSelect(){
+  const sel = document.getElementById('donTithi');
+  if(!sel) return;
+  sel.innerHTML = TITHI_GROUPS.map(g=>'<optgroup label="'+g.label+'">'+g.items.map(t=>'<option>'+t+'</option>').join('')+'</optgroup>').join('');
+}
+
+/* ---- Amount → Marathi words (for the reminder letter) ---- */
+const MR_NUM_0_99 = ['शून्य','एक','दोन','तीन','चार','पाच','सहा','सात','आठ','नऊ','दहा','अकरा','बारा','तेरा','चौदा','पंधरा','सोळा','सतरा','अठरा','एकोणीस','वीस',
+'एकवीस','बावीस','तेवीस','चोवीस','पंचवीस','सव्वीस','सत्तावीस','अठ्ठावीस','एकोणतीस','तीस','एकतीस','बत्तीस','तेहतीस','चौतीस','पस्तीस','छत्तीस','सदतीस','अडतीस','एकोणचाळीस','चाळीस',
+'एकेचाळीस','बेचाळीस','त्रेचाळीस','चव्वेचाळीस','पंचेचाळीस','सेहेचाळीस','सत्तेचाळीस','अठ्ठेचाळीस','एकोणपन्नास','पन्नास','एकावन्न','बावन्न','त्रेपन्न','चौपन्न','पंचावन्न','छप्पन्न','सत्तावन्न','अठ्ठावन्न','एकोणसाठ','साठ',
+'एकसष्ट','बासष्ट','त्रेसष्ट','चौसष्ट','पासष्ट','सहासष्ट','सदुसष्ट','अडुसष्ट','एकोणसत्तर','सत्तर','एकाहत्तर','बाहत्तर','त्र्याहत्तर','चौऱ्याहत्तर','पंच्याहत्तर','शहात्तर','सत्याहत्तर','अठ्ठ्याहत्तर','एकोणऐंशी','ऐंशी',
+'एक्क्याऐंशी','ब्याऐंशी','त्र्याऐंशी','चौऱ्याऐंशी','पंच्याऐंशी','शहाऐंशी','सत्त्याऐंशी','अठ्ठ्याऐंशी','एकोणनव्वद','नव्वद','एक्क्याण्णव','ब्याण्णव','त्र्याण्णव','चौऱ्याण्णव','पंच्याण्णव','शहाण्णव','सत्त्याण्णव','अठ्ठ्याण्णव','नव्व्याण्णव'];
+function mrWordsBelow1000(n){
+  const h = Math.floor(n/100), r = n%100;
+  let out = '';
+  if(h){ out += (h===1 ? 'एकशे' : MR_NUM_0_99[h]+'शे'); }
+  if(r){ out += (out?' ':'') + MR_NUM_0_99[r]; }
+  if(h && !r && h===1) out = 'शंभर';
+  return out;
+}
+function amountToMarathiWords(num){
+  num = Math.floor(Number(num)||0);
+  if(num<=0) return 'शून्य';
+  const parts = [];
+  const crore = Math.floor(num/10000000); num %= 10000000;
+  const lakh = Math.floor(num/100000); num %= 100000;
+  const thousand = Math.floor(num/1000); num %= 1000;
+  if(crore) parts.push(MR_NUM_0_99[crore]+' कोटी');
+  if(lakh) parts.push(MR_NUM_0_99[lakh]+' लाख');
+  if(thousand) parts.push(MR_NUM_0_99[thousand]+' हजार');
+  if(num) parts.push(mrWordsBelow1000(num));
+  return parts.join(' ');
+}
 function fmtDateMr(iso){
   if(!iso) return '-';
   const d = new Date(iso+'T00:00:00');
@@ -958,7 +1172,13 @@ function loadStore(){
 function migrateStore(store){
   store.yajaman = store.yajaman || [];
   store.donations = store.donations || [];
+  store.expenses = store.expenses || [];
   store.nextYajaman = store.nextYajaman || 1;
+  store.nextExpense = store.nextExpense || 1;
+  store.settings = Object.assign({
+    instName:'श्री संत सखाराम महाराज संस्थान', instVillage:'अमळनेर', instDistrict:'जळगाव', instContact:'', instEmail:'',
+    bankName:'', bankHolder:'', bankAccount:'', bankIFSC:'', bankBranch:''
+  }, store.settings || {});
   let changed = false;
   store.yajaman.forEach(y=>{
     if(!y.id){
@@ -971,6 +1191,7 @@ function migrateStore(store){
       const match = store.yajaman.find(y=>y.name===d.name);
       if(match){ d.yajamanId = match.id; changed = true; }
     }
+    if(typeof d.cancelled === 'undefined'){ d.cancelled = false; changed = true; }
   });
   if(changed){
     try{ localStorage.setItem(STORE_KEY, JSON.stringify(store)); }catch(e){}
@@ -987,16 +1208,28 @@ function genYajamanId(){ return 'YJ-' + String(STORE.nextYajaman++).padStart(6,'
 function fmtAmt(n){ return '₹'+Number(n||0).toLocaleString('en-IN'); }
 
 /* ---- Derived stats: NEVER trust a stored total, always compute from donation records ---- */
+/* Cancelled donations are kept for the audit trail but never counted in totals/stats. */
+function activeDonations(){ return STORE.donations.filter(d=>!d.cancelled); }
 function donationsFor(yajamanId){
   return STORE.donations.filter(d=>d.yajamanId===yajamanId);
 }
+function activeDonationsFor(yajamanId){
+  return donationsFor(yajamanId).filter(d=>!d.cancelled);
+}
 function yajamanStats(yajamanId){
-  const list = donationsFor(yajamanId);
+  const list = activeDonationsFor(yajamanId);
   const total = list.reduce((s,d)=>s+Number(d.amount||0),0);
   const sorted = list.slice().sort((a,b)=>(a.dateISO||'').localeCompare(b.dateISO||''));
   const last = sorted.length ? sorted[sorted.length-1] : null;
   return {total, count:list.length, lastDate: last ? last.date : '—'};
 }
+/* Pledge (संकल्प) position: pledge, paid (active donations only), due */
+function pledgeStats(y){
+  const pledge = Number(y.pledge||0);
+  const paid = yajamanStats(y.id).total;
+  return {pledge, paid, due: Math.max(pledge-paid,0)};
+}
+function todayISO(){ return new Date().toISOString().slice(0,10); }
 
 let editingDonationNo = null;
 let editingYajamanId = null;
@@ -1004,15 +1237,18 @@ let editingYajamanId = null;
 function renderDonations(){
   const body = document.getElementById('donationsTableBody');
   body.innerHTML = STORE.donations.slice().reverse().map(d=>
-    '<tr><td class="muted">'+d.no+'</td><td>'+d.name+(d.yajamanId?' <span class="muted" style="font-size:11px;">('+d.yajamanId+')</span>':'')+'</td><td>'+d.tithi+'</td><td class="muted">'+d.type+'</td><td class="amount">'+fmtAmt(d.amount)+'</td>'+
-    '<td><div class="row-actions">'+
+    '<tr class="'+(d.cancelled?'row-cancelled':'')+'"><td class="muted">'+d.no+'</td><td>'+d.name+(d.yajamanId?' <span class="muted" style="font-size:11px;">('+d.yajamanId+')</span>':'')+'</td><td>'+d.tithi+'</td><td class="muted">'+d.type+'</td><td class="amount">'+fmtAmt(d.amount)+'</td>'+
+    '<td>'+(d.cancelled?'<span class="badge cancelled">रद्द</span>':'<span class="badge paid">जमा</span>')+'</td>'+
+    '<td class="row-actions-cell"><div class="row-actions">'+
       '<span class="row-action" title="पहा" onclick="viewReceipt(\''+d.no+'\')"><i class="ti ti-eye"></i></span>'+
-      '<span class="row-action" title="संपादन" onclick="editDonation(\''+d.no+'\')"><i class="ti ti-pencil"></i></span>'+
-      '<span class="row-action" title="प्रिंट" onclick="printReceipt(\''+d.no+'\')"><i class="ti ti-printer"></i></span>'+
-      '<span class="row-action" title="डाउनलोड" onclick="downloadReceiptPDF(\''+d.no+'\')"><i class="ti ti-download"></i></span>'+
-      '<span class="row-action danger" title="हटवा" onclick="deleteDonation(\''+d.no+'\')"><i class="ti ti-trash"></i></span>'+
+      (d.cancelled
+        ? '<span class="row-action restore" title="पुनर्संचयित करा" onclick="restoreDonation(\''+d.no+'\')"><i class="ti ti-circle-check"></i></span>'
+        : '<span class="row-action edit" title="संपादन" onclick="editDonation(\''+d.no+'\')"><i class="ti ti-pencil"></i></span>'+
+          '<span class="row-action" title="प्रिंट" onclick="printReceipt(\''+d.no+'\')"><i class="ti ti-printer"></i></span>'+
+          '<span class="row-action" title="डाउनलोड" onclick="downloadReceiptPDF(\''+d.no+'\')"><i class="ti ti-download"></i></span>'+
+          '<span class="row-action danger" title="रद्द करा" onclick="cancelDonation(\''+d.no+'\')"><i class="ti ti-trash"></i></span>')+
     '</div></td></tr>'
-  ).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:24px;">अजून कोणतीही देणगी नोंद नाही</td></tr>';
+  ).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;">अजून कोणतीही देणगी नोंद नाही</td></tr>';
 }
 function renderYajaman(){
   const body = document.getElementById('yajamanTableBody');
@@ -1029,38 +1265,46 @@ function renderYajaman(){
   }
   body.innerHTML = list.map((y,idx)=>{
     const st = yajamanStats(y.id);
+    const pl = pledgeStats(y);
     return '<tr><td class="muted">'+(idx+1)+'</td>'+
       '<td class="muted" style="font-weight:600;color:var(--kesari);">'+y.id+'</td>'+
       '<td><span class="link" onclick="openYajamanProfile(\''+y.id+'\')">'+y.name+'</span></td>'+
       '<td>'+y.village+'</td><td class="muted">'+(y.mobile||'-')+'</td>'+
-      '<td class="amount">'+fmtAmt(st.total)+'</td><td class="num">'+st.count+'</td><td class="muted">'+st.lastDate+'</td>'+
+      '<td class="num">'+(pl.pledge?fmtAmt(pl.pledge):'—')+'</td><td class="amount">'+fmtAmt(st.total)+'</td>'+
+      '<td class="num" style="font-weight:600;color:'+(pl.pledge&&pl.due>0?'#DC2626':'#16A34A')+';">'+(pl.pledge?fmtAmt(pl.due):'—')+'</td>'+
+      '<td class="num">'+st.count+'</td><td class="muted">'+st.lastDate+'</td>'+
       '<td><div class="row-actions">'+
         '<span class="row-action" title="प्रोफाइल पहा" onclick="openYajamanProfile(\''+y.id+'\')"><i class="ti ti-eye"></i></span>'+
-        '<span class="row-action" title="संपादन" onclick="editYajaman(\''+y.id+'\')"><i class="ti ti-pencil"></i></span>'+
+        '<span class="row-action edit" title="संपादन" onclick="editYajaman(\''+y.id+'\')"><i class="ti ti-pencil"></i></span>'+
         '<span class="row-action" title="नवीन देणगी" onclick="newDonationForYajaman(\''+y.id+'\')"><i class="ti ti-plus"></i></span>'+
         '<span class="row-action danger" title="हटवा" onclick="deleteYajaman(\''+y.id+'\')"><i class="ti ti-trash"></i></span>'+
       '</div></td></tr>';
-  }).join('') || '<tr><td colspan="9" class="muted" style="text-align:center;padding:24px;">कोणताही यजमान सापडला नाही</td></tr>';
+  }).join('') || '<tr><td colspan="11" class="muted" style="text-align:center;padding:24px;">कोणताही यजमान सापडला नाही</td></tr>';
 }
 let dashTrendChartInst=null, dashTithiChartInst=null, rpTithiChartInst=null, rpModeChartInst=null;
 const CHART_KESARI = '#C2410C', CHART_GOLD='#B08D32';
 const CHART_PALETTE = ['#C2410C','#B08D32','#2563EB','#16A34A','#7C3AED','#D97706','#DC2626','#0891B2'];
 
 function renderDashboard(){
-  const today = STORE.donations.reduce((s,d)=>s+Number(d.amount||0),0);
-  document.getElementById('statTodayAmount').textContent = fmtAmt(today);
-  document.getElementById('statTodayCount').textContent = STORE.donations.length;
+  const active = activeDonations();
+  const today = todayISO();
+  const todaysList = active.filter(d=>d.dateISO===today);
+  const todayAmount = todaysList.reduce((s,d)=>s+Number(d.amount||0),0);
+  document.getElementById('statTodayAmount').textContent = fmtAmt(todayAmount);
+  document.getElementById('statTodayCount').textContent = todaysList.length;
   document.getElementById('statYajamanCount').textContent = STORE.yajaman.length.toLocaleString('en-IN');
+  const chaturmasAmount = active.reduce((s,d)=>s+Number(d.amount||0),0);
+  document.getElementById('statChaturmasAmount').textContent = fmtAmt(chaturmasAmount);
 
   const recentBody = document.getElementById('dashRecentBody');
-  const recent = STORE.donations.slice().reverse().slice(0,6);
+  const recent = active.slice().reverse().slice(0,6);
   recentBody.innerHTML = recent.map(d=>
     '<tr><td class="muted">'+d.no+'</td><td>'+d.name+'</td><td>'+d.tithi+'</td><td class="amount">'+fmtAmt(d.amount)+'</td></tr>'
   ).join('') || '<tr><td colspan="4" class="muted" style="text-align:center;padding:20px;">अजून कोणतीही देणगी नोंद नाही</td></tr>';
 
   if(!window.Chart) return;
-  // Trend chart: last up to 10 donations amount over receipt sequence
-  const trend = STORE.donations.slice(-10);
+  // Trend chart: last up to 10 active donations amount over receipt sequence
+  const trend = active.slice(-10);
   const trendCanvas = document.getElementById('dashTrendChart');
   if(dashTrendChartInst) dashTrendChartInst.destroy();
   dashTrendChartInst = new Chart(trendCanvas, {
@@ -1070,7 +1314,7 @@ function renderDashboard(){
   });
   // Tithi-wise donut
   const tithiTotals = {};
-  STORE.donations.forEach(d=>{ tithiTotals[d.tithi] = (tithiTotals[d.tithi]||0) + Number(d.amount||0); });
+  active.forEach(d=>{ tithiTotals[d.tithi] = (tithiTotals[d.tithi]||0) + Number(d.amount||0); });
   const tithiLabels = Object.keys(tithiTotals);
   const tithiCanvas = document.getElementById('dashTithiChart');
   if(dashTithiChartInst) dashTithiChartInst.destroy();
@@ -1080,7 +1324,109 @@ function renderDashboard(){
     options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{position:'bottom', labels:{boxWidth:12, font:{size:11}}}} }
   });
 }
-function refreshAll(){ renderDonations(); renderYajaman(); renderDashboard(); }
+
+/* ---- Chaturmas / tithi summary — computed from real donation records, nothing hardcoded ---- */
+function renderChaturmasPage(){
+  const body = document.getElementById('chaturmasTableBody');
+  if(!body) return;
+  const active = activeDonations();
+  const byTithi = {};
+  active.forEach(d=>{
+    const t = d.tithi || '—';
+    if(!byTithi[t]) byTithi[t] = {tithi:t, yajamanSet:new Set(), count:0, amount:0, firstISO:null, lastISO:null};
+    const g = byTithi[t];
+    g.yajamanSet.add(d.yajamanId || d.name);
+    g.count++;
+    g.amount += Number(d.amount||0);
+    if(d.dateISO){
+      if(!g.firstISO || d.dateISO < g.firstISO) g.firstISO = d.dateISO;
+      if(!g.lastISO || d.dateISO > g.lastISO) g.lastISO = d.dateISO;
+    }
+  });
+  const groups = Object.values(byTithi).sort((a,b)=> (b.amount)-(a.amount));
+  const grandTotal = groups.reduce((s,g)=>s+g.amount,0);
+  body.innerHTML = groups.map((g,idx)=>{
+    const rangeTxt = g.firstISO ? (fmtDateMr(g.firstISO)+(g.lastISO && g.lastISO!==g.firstISO ? ' — '+fmtDateMr(g.lastISO) : '')) : '-';
+    return '<tr><td class="muted num">'+(idx+1)+'</td><td>'+g.tithi+'</td><td class="muted">'+rangeTxt+'</td>'+
+      '<td class="num">'+g.yajamanSet.size+'</td><td class="num">'+g.count+'</td><td class="amount">'+fmtAmt(g.amount)+'</td></tr>';
+  }).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:24px;">अजून कोणतीही देणगी नोंद नाही</td></tr>';
+  document.getElementById('chaturmasTotal').textContent = 'एकूण देणगी: '+fmtAmt(grandTotal);
+}
+
+/* ---- INDEX register — real records, searchable ---- */
+function renderIndexPage(){
+  const body = document.getElementById('indexTableBody');
+  if(!body) return;
+  const q = (document.getElementById('indexSearchBox')?.value || '').trim().toLowerCase();
+  let list = STORE.donations.slice().sort((a,b)=>(a.dateISO||'').localeCompare(b.dateISO||'') || a.no.localeCompare(b.no));
+  if(q){
+    list = list.filter(d =>
+      (d.no||'').toLowerCase().includes(q) ||
+      (d.name||'').toLowerCase().includes(q) ||
+      (d.village||'').toLowerCase().includes(q)
+    );
+  }
+  let total = 0;
+  body.innerHTML = list.map((d,idx)=>{
+    if(!d.cancelled) total += Number(d.amount||0);
+    return '<tr'+(d.cancelled?' class="row-cancelled"':'')+'><td class="muted">'+(idx+1)+'</td><td class="muted">'+d.no+'</td><td>'+d.name+'</td><td>'+d.village+'</td>'+
+      '<td class="muted">'+d.date+'</td><td class="amount">'+fmtAmt(d.amount)+'</td>'+
+      '<td>'+(d.cancelled?'<span class="badge cancelled">रद्द</span>':'<span class="badge paid">जमा</span>')+'</td></tr>';
+  }).join('') || '<tr><td colspan="7" class="muted" style="text-align:center;padding:24px;">कोणतीही नोंद सापडली नाही</td></tr>';
+  document.getElementById('indexTotal').textContent = 'एकूण देणगी: '+fmtAmt(total);
+}
+
+/* ---- Accounts: real totals from donations (जमा) and expenses (खर्च) ---- */
+function renderAccountsPage(){
+  const jamaBody = document.getElementById('acJama');
+  if(!jamaBody) return;
+  const jama = activeDonations().reduce((s,d)=>s+Number(d.amount||0),0);
+  const kharch = STORE.expenses.reduce((s,e)=>s+Number(e.amount||0),0);
+  document.getElementById('acJama').textContent = fmtAmt(jama);
+  document.getElementById('acKharch').textContent = fmtAmt(kharch);
+  document.getElementById('acShillak').textContent = fmtAmt(jama-kharch);
+
+  const trans = [];
+  activeDonations().forEach(d=> trans.push({dateISO:d.dateISO, date:d.date, desc:'देणगी - '+d.name, type:'जमा', amount:d.amount, kind:'donation', ref:d.no}));
+  STORE.expenses.forEach(e=> trans.push({dateISO:e.dateISO, date:e.date, desc:e.desc, type:'खर्च', amount:e.amount, kind:'expense', ref:e.no}));
+  trans.sort((a,b)=>(b.dateISO||'').localeCompare(a.dateISO||''));
+  const body = document.getElementById('acTransBody');
+  body.innerHTML = trans.slice(0,50).map(t=>
+    '<tr><td class="muted">'+t.date+'</td><td>'+t.desc+'</td><td class="muted">'+t.type+'</td><td class="amount">'+fmtAmt(t.amount)+'</td>'+
+    '<td><span class="badge '+(t.kind==='donation'?'paid':'pending')+'">'+(t.kind==='donation'?'जमा':'खर्च')+'</span></td>'+
+    '<td>'+(t.kind==='expense' ? '<div class="row-actions"><span class="row-action danger" title="हटवा" onclick="deleteExpense(\''+t.ref+'\')"><i class="ti ti-trash"></i></span></div>' : '')+'</td></tr>'
+  ).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:24px;">अजून कोणताही व्यवहार नाही</td></tr>';
+}
+function saveExpense(){
+  const amount = document.getElementById('expAmount').value.trim();
+  const desc = document.getElementById('expDesc').value.trim();
+  if(!amount || !desc){ showToast('कृपया रक्कम व तपशील भरा'); return; }
+  const amt = Number(amount);
+  if(!(amt>0)){ showToast('कृपया योग्य रक्कम भरा'); return; }
+  const dateISO = document.getElementById('expDate').value || todayISO();
+  const no = 'EX-'+String(STORE.nextExpense++).padStart(5,'0');
+  STORE.expenses.push({no, amount:amt, desc, dateISO, date:fmtDateMr(dateISO)});
+  persist();
+  refreshAll();
+  document.getElementById('expAmount').value='';
+  document.getElementById('expDesc').value=''; document.getElementById('expDesc').dataset.committed=''; document.getElementById('expDesc').dataset.raw='';
+  document.getElementById('expDate').value='';
+  showToast('खर्च नोंद जतन झाली — '+no);
+}
+function deleteExpense(no){
+  const rec = STORE.expenses.find(x=>x.no===no);
+  if(!rec) return;
+  showConfirmModal('ही खर्च नोंद कायमची हटवायची आहे का?', function(){
+    STORE.expenses = STORE.expenses.filter(x=>x.no!==no);
+    persist(); refreshAll();
+    showToast('खर्च नोंद हटवली');
+  });
+}
+
+function refreshAll(){
+  renderDonations(); renderYajaman(); renderDashboard();
+  renderChaturmasPage(); renderIndexPage(); renderAccountsPage();
+}
 refreshAll();
 
 /* ---- Donation: link by Yajaman ID, save / edit / delete ---- */
@@ -1099,11 +1445,15 @@ function searchYajamanForDonation(){
   setField('donVillage', y.village);
   setField('donTaluka', y.taluka||'');
   document.getElementById('donMobile').value = y.mobile||'';
+  document.getElementById('donMobile2').value = y.mobile2||'';
+  document.getElementById('donPincode').value = y.pincode||'';
+  setField('donDistrict', y.district||'');
+  setField('donGotra', y.gotra||'');
   document.getElementById('donYajId').value = y.id;
   msg.style.display='block'; msg.style.background='#EAF6EC'; msg.style.color='#1E7A34';
   msg.textContent = 'यजमान सापडला: '+y.name+' ('+y.id+') — माहिती भरली गेली.';
 }
-function saveDonation(){
+function saveDonation(finalize){
   const name = document.getElementById('donName').value.trim();
   const amount = document.getElementById('donAmount').value.trim();
   if(!name || !amount){
@@ -1119,6 +1469,16 @@ function saveDonation(){
   const tithi = document.getElementById('donTithi').value;
   const type = document.getElementById('donType').value;
   const mobile = document.getElementById('donMobile').value.trim();
+  const extra = {
+    samarth: document.getElementById('donSamarth').value.trim(),
+    gotra: document.getElementById('donGotra').value.trim(),
+    mobile2: document.getElementById('donMobile2').value.trim(),
+    taluka: document.getElementById('donTaluka').value.trim(),
+    district: document.getElementById('donDistrict').value.trim(),
+    pincode: document.getElementById('donPincode').value.trim(),
+    paymentRef: document.getElementById('donPaymentRef').value.trim(),
+    note: document.getElementById('donNote').value.trim()
+  };
   const dateISO = document.getElementById('donDate').value || new Date().toISOString().slice(0,10);
   const amt = Number(amount)||0;
   let yajamanId = document.getElementById('donYajId').value.trim().toUpperCase() || null;
@@ -1130,7 +1490,7 @@ function saveDonation(){
   if(!yajamanId){
     // no ID supplied — link/create by name for backward compatibility
     let y = STORE.yajaman.find(y=>y.name===name);
-    if(!y){ y = {id:genYajamanId(), name, village, mobile, taluka:''}; STORE.yajaman.push(y); }
+    if(!y){ y = {id:genYajamanId(), name, village, mobile, mobile2:extra.mobile2, taluka:extra.taluka, district:extra.district, pincode:extra.pincode, gotra:extra.gotra}; STORE.yajaman.push(y); }
     yajamanId = y.id;
   }
 
@@ -1139,19 +1499,21 @@ function saveDonation(){
     if(rec){
       rec.name=name; rec.village=village; rec.tithi=tithi; rec.type=type; rec.amount=amt;
       rec.dateISO=dateISO; rec.date=fmtDateMr(dateISO); rec.yajamanId=yajamanId;
+      Object.assign(rec, extra);
+      if(finalize===true) rec.finalized = true;
       persist(); refreshAll();
       showToast('देणगी नोंद अद्ययावत झाली — पावती क्र. '+rec.no);
       const savedRec = rec;
       editingDonationNo = null;
       document.getElementById('donationFormTitle').textContent = 'नवीन देणगी नोंद';
-      document.getElementById('donSaveBtn').innerHTML = '<i class="ti ti-device-floppy"></i>देणगी जतन करा';
+      document.getElementById('donSaveBtn').innerHTML = '<i class="ti ti-device-floppy"></i>जतन करा';
       clearDonationForm(false);
       return savedRec;
     }
   }
 
   const no = String(STORE.nextReceipt++).padStart(6,'0');
-  const record = {no, yajamanId, name, village, tithi, type, amount:amt, dateISO, date:fmtDateMr(dateISO)};
+  const record = Object.assign({no, yajamanId, name, village, tithi, type, amount:amt, dateISO, date:fmtDateMr(dateISO), finalized: finalize===true, cancelled:false}, extra);
   STORE.donations.push(record);
   persist();
   refreshAll();
@@ -1168,38 +1530,65 @@ function editDonation(no){
   const setField = (id,val)=>{ const el=document.getElementById(id); el.value=val; el.dataset.committed=val; el.dataset.raw=''; };
   setField('donName', rec.name);
   setField('donVillage', rec.village);
+  setField('donSamarth', rec.samarth||'');
+  setField('donGotra', rec.gotra||'');
+  setField('donTaluka', rec.taluka||'');
+  setField('donDistrict', rec.district||'');
+  setField('donNote', rec.note||'');
+  document.getElementById('donPincode').value = rec.pincode||'';
+  document.getElementById('donMobile2').value = rec.mobile2||'';
   document.getElementById('donYajId').value = rec.yajamanId || '';
   document.getElementById('donYajFoundMsg').style.display='none';
-  document.getElementById('donMobile').value = '';
+  const yy = STORE.yajaman.find(x=>x.id===rec.yajamanId);
+  document.getElementById('donMobile').value = (yy && yy.mobile) || '';
   document.getElementById('donTithi').value = rec.tithi;
-  document.getElementById('donType').value = rec.type;
+  document.getElementById('donType').value = (rec.type==='ऑनलाइन') ? 'UPI' : rec.type;
+  onDonTypeChange();
+  document.getElementById('donPaymentRef').value = rec.paymentRef||'';
   document.getElementById('donAmount').value = rec.amount;
   document.getElementById('donDate').value = rec.dateISO || '';
   goTo('donation');
   window.scrollTo({top:0,behavior:'smooth'});
 }
-function deleteDonation(no){
+/* Donations are never hard-deleted: cancel keeps the record (with a reason) for the audit
+   trail but drops it out of every total; restore brings it back. */
+function cancelDonation(no){
   const rec = STORE.donations.find(x=>x.no===no);
   if(!rec) return;
-  showConfirmModal('पावती क्र. '+no+' ही देणगी नोंद कायमची हटवायची आहे का?', function(){
-    STORE.donations = STORE.donations.filter(x=>x.no!==no);
+  showConfirmModal('पावती क्र. '+no+' ही देणगी नोंद रद्द करायची आहे का? नोंद इतिहासात राहील पण एकूण बेरजेत मोजली जाणार नाही.', function(){
+    const reason = prompt('रद्द करण्याचे कारण (ऐच्छिक):') || '';
+    rec.cancelled = true;
+    rec.cancelReason = reason;
+    rec.cancelledAt = new Date().toISOString();
     persist();
     refreshAll();
-    showToast('देणगी नोंद हटवली — पावती क्र. '+no);
-  });
+    showToast('देणगी नोंद रद्द केली — पावती क्र. '+no);
+  }, {okLabel:'होय, रद्द करा'});
+}
+function restoreDonation(no){
+  const rec = STORE.donations.find(x=>x.no===no);
+  if(!rec) return;
+  showConfirmModal('पावती क्र. '+no+' ही रद्द केलेली देणगी नोंद पुनर्संचयित करायची आहे का?', function(){
+    rec.cancelled = false;
+    rec.cancelReason = '';
+    persist();
+    refreshAll();
+    showToast('देणगी नोंद पुनर्संचयित झाली — पावती क्र. '+no);
+  }, {okLabel:'होय, पुनर्संचयित करा'});
 }
 function clearDonationForm(toastMsg){
-  ['donName','donMobile','donVillage','donTaluka','donAmount','donNote'].forEach(id=>{
+  ['donName','donMobile','donMobile2','donVillage','donTaluka','donDistrict','donPincode','donSamarth','donGotra','donAmount','donNote','donPaymentRef'].forEach(id=>{
     const el = document.getElementById(id);
     el.value=''; el.dataset.committed=''; el.dataset.raw='';
   });
   document.getElementById('donDate').value='';
   document.getElementById('donYajId').value='';
   document.getElementById('donYajFoundMsg').style.display='none';
+  document.getElementById('donType').value='रोख'; onDonTypeChange();
   if(editingDonationNo){
     editingDonationNo = null;
     document.getElementById('donationFormTitle').textContent = 'नवीन देणगी नोंद';
-    document.getElementById('donSaveBtn').innerHTML = '<i class="ti ti-device-floppy"></i>देणगी जतन करा';
+    document.getElementById('donSaveBtn').innerHTML = '<i class="ti ti-device-floppy"></i>जतन करा';
   }
   if(toastMsg!==false) showToast('फॉर्म रिकामा केला');
 }
@@ -1209,7 +1598,7 @@ function openNewYajamanForm(){
   editingYajamanId = null;
   document.getElementById('yajFormTitle').firstChild.textContent = 'यजमान नोंदणी';
   document.getElementById('yajSaveBtn').innerHTML = '<i class="ti ti-device-floppy"></i>यजमान जतन करा';
-  ['yajName','yajMobile','yajVillage','yajTaluka','yajPincode'].forEach(id=>{
+  ['yajName','yajMobile','yajVillage','yajTaluka','yajPincode','yajGotra','yajPledge'].forEach(id=>{
     const el=document.getElementById(id); el.value=''; el.dataset.committed=''; el.dataset.raw='';
   });
   document.getElementById('yajId').value = '';
@@ -1230,6 +1619,8 @@ function editYajaman(id){
   document.getElementById('yajMobile').value = y.mobile||'';
   document.getElementById('yajDistrict').value = y.district||'जळगाव';
   document.getElementById('yajPincode').value = y.pincode||'';
+  setField('yajGotra', y.gotra);
+  document.getElementById('yajPledge').value = y.pledge||'';
   goTo('yajaman');
   document.getElementById('yajamanForm').style.display='block';
   window.scrollTo({top:0,behavior:'smooth'});
@@ -1243,11 +1634,15 @@ function saveYajaman(){
   const mobile = document.getElementById('yajMobile').value.trim();
   const district = document.getElementById('yajDistrict').value.trim();
   const pincode = document.getElementById('yajPincode').value.trim();
+  const gotra = document.getElementById('yajGotra').value.trim();
+  const pledgeRaw = document.getElementById('yajPledge').value.trim();
+  const pledge = pledgeRaw ? Number(pledgeRaw) : 0;
+  if(pledgeRaw && !(pledge>=0)){ showToast('संकल्पित रक्कम योग्य भरा'); return; }
 
   if(editingYajamanId){
     const y = STORE.yajaman.find(x=>x.id===editingYajamanId);
     if(y){
-      y.name=name; y.village=village; y.taluka=taluka; y.mobile=mobile; y.district=district; y.pincode=pincode;
+      y.name=name; y.village=village; y.taluka=taluka; y.mobile=mobile; y.district=district; y.pincode=pincode; y.gotra=gotra; y.pledge=pledge;
       persist(); refreshAll();
       showToast('यजमान माहिती अद्ययावत झाली — '+y.id);
       editingYajamanId=null;
@@ -1269,11 +1664,11 @@ function saveYajaman(){
     }
   }
   const id = genYajamanId();
-  STORE.yajaman.push({id, name, village, taluka, mobile, district, pincode});
+  STORE.yajaman.push({id, name, village, taluka, mobile, district, pincode, gotra, pledge});
   persist();
   refreshAll();
   showToast('यजमान यशस्वीरित्या नोंदणीकृत झाला — Yajaman ID: '+id);
-  ['yajName','yajMobile','yajVillage','yajTaluka','yajPincode'].forEach(fid=>{
+  ['yajName','yajMobile','yajVillage','yajTaluka','yajPincode','yajGotra','yajPledge'].forEach(fid=>{
     const el = document.getElementById(fid);
     el.value=''; el.dataset.committed=''; el.dataset.raw='';
   });
@@ -1295,8 +1690,53 @@ function deleteYajaman(id){
   });
 }
 
+/* ---- Period filter helpers (shared by Reports, Yajaman Profile history, Ledger/PDF) ---- */
+function filterByPeriod(list, f){
+  return list.filter(d=>{
+    if(!d.dateISO) return f.type==='all';
+    const dt = new Date(d.dateISO+'T00:00:00');
+    if(f.type==='all') return true;
+    if(f.type==='yearly') return dt.getFullYear()===f.year;
+    return dt.getFullYear()===f.year && dt.getMonth()===f.month;
+  });
+}
+function periodLabel(f){
+  return f.type==='all' ? 'सर्व कालावधी' : f.type==='yearly' ? ('वर्ष '+f.year) : (MR_MONTHS[f.month]+' '+f.year);
+}
+
 /* ---- Yajaman Profile ---- */
 let currentProfileId = null;
+function onPfPeriodChange(){
+  const type = document.getElementById('pfPeriodType').value;
+  document.getElementById('pfMonthWrap').style.display = (type==='monthly') ? '' : 'none';
+  document.getElementById('pfYearWrap').style.display = (type==='all') ? 'none' : '';
+}
+function currentPfFilter(){
+  const type = document.getElementById('pfPeriodType').value;
+  const month = Number(document.getElementById('pfMonth').value);
+  const year = Number(document.getElementById('pfYear').value);
+  return {type, month, year};
+}
+function refreshPfHistory(){
+  if(!currentProfileId) return;
+  const f = currentPfFilter();
+  const body = document.getElementById('pfHistoryBody');
+  const list = filterByPeriod(donationsFor(currentProfileId), f).slice().sort((a,b)=>(b.dateISO||'').localeCompare(a.dateISO||''));
+  let total = 0;
+  body.innerHTML = list.map(d=>{
+    if(!d.cancelled) total += Number(d.amount||0);
+    return '<tr'+(d.cancelled?' class="row-cancelled"':'')+'><td class="muted">'+d.no+'</td><td>'+d.date+'</td><td>'+d.tithi+'</td><td class="muted">'+d.type+'</td><td class="amount">'+fmtAmt(d.amount)+'</td>'+
+      '<td><div class="row-actions">'+
+        '<span class="row-action" title="पहा" onclick="viewReceipt(\''+d.no+'\')"><i class="ti ti-eye"></i></span>'+
+        (d.cancelled
+          ? '<span class="row-action restore" title="पुनर्संचयित करा" onclick="restoreDonation(\''+d.no+'\')"><i class="ti ti-circle-check"></i></span>'
+          : '<span class="row-action" title="प्रिंट" onclick="printReceipt(\''+d.no+'\')"><i class="ti ti-printer"></i></span>'+
+            '<span class="row-action" title="PDF" onclick="downloadReceiptPDF(\''+d.no+'\')"><i class="ti ti-download"></i></span>')+
+      '</div></td></tr>';
+  }).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px;">या कालावधीत कोणतीही देणगी नाही</td></tr>';
+  document.getElementById('pfHistoryTotal').textContent = 'एकूण देणगी: '+fmtAmt(total);
+  document.getElementById('pfHistoryPeriodLabel').textContent = periodLabel(f);
+}
 function openYajamanProfile(id){
   const y = STORE.yajaman.find(x=>x.id===id);
   if(!y) return;
@@ -1307,20 +1747,18 @@ function openYajamanProfile(id){
   document.getElementById('pfVillage').textContent = y.village || '-';
   document.getElementById('pfTaluka').textContent = y.taluka || '-';
   document.getElementById('pfDistrict').textContent = y.district || '-';
+  document.getElementById('pfGotra').textContent = y.gotra || '-';
+  document.getElementById('pfPincode').textContent = y.pincode || '-';
+  const pls = pledgeStats(y);
+  document.getElementById('pfPledge').textContent = pls.pledge ? fmtAmt(pls.pledge) : 'नोंद नाही';
+  document.getElementById('pfDue').textContent = pls.pledge ? fmtAmt(pls.due) : '—';
   const st = yajamanStats(id);
   document.getElementById('pfTotal').textContent = fmtAmt(st.total);
   document.getElementById('pfCount').textContent = st.count;
   document.getElementById('pfLast').textContent = st.lastDate;
-  const body = document.getElementById('pfHistoryBody');
-  const list = donationsFor(id).slice().sort((a,b)=>(b.dateISO||'').localeCompare(a.dateISO||''));
-  body.innerHTML = list.map(d=>
-    '<tr><td class="muted">'+d.no+'</td><td>'+d.date+'</td><td>'+d.tithi+'</td><td class="muted">'+d.type+'</td><td class="amount">'+fmtAmt(d.amount)+'</td>'+
-    '<td><div class="row-actions">'+
-      '<span class="row-action" title="पहा" onclick="viewReceipt(\''+d.no+'\')"><i class="ti ti-eye"></i></span>'+
-      '<span class="row-action" title="प्रिंट" onclick="printReceipt(\''+d.no+'\')"><i class="ti ti-printer"></i></span>'+
-      '<span class="row-action" title="PDF" onclick="downloadReceiptPDF(\''+d.no+'\')"><i class="ti ti-download"></i></span>'+
-    '</div></td></tr>'
-  ).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px;">अजून कोणतीही देणगी नाही</td></tr>';
+  document.getElementById('pfPeriodType').value = 'all';
+  onPfPeriodChange();
+  refreshPfHistory();
   goTo('yajaman-profile');
 }
 function newDonationForYajaman(id){
@@ -1338,49 +1776,111 @@ function printYajamanLedger(){
 function renderYajamanLedgerPage(id){
   const y = STORE.yajaman.find(x=>x.id===id);
   if(!y) return;
-  const st = yajamanStats(id);
-  const list = donationsFor(id).slice().sort((a,b)=>(a.dateISO||'').localeCompare(b.dateISO||''));
+  const f = currentPfFilter();
+  const list = filterByPeriod(donationsFor(id), f).slice().sort((a,b)=>(a.dateISO||'').localeCompare(b.dateISO||''));
+  const activeList = list.filter(d=>!d.cancelled);
+  const total = activeList.reduce((s,d)=>s+Number(d.amount||0),0);
   document.getElementById('ldName').textContent = y.name;
   document.getElementById('ldId').textContent = y.id;
   document.getElementById('ldMobile').textContent = y.mobile || '-';
   document.getElementById('ldVillage').textContent = y.village || '-';
   document.getElementById('ldTaluka').textContent = y.taluka || '-';
   document.getElementById('ldDistrict').textContent = y.district || '-';
-  document.getElementById('ldCount').textContent = st.count;
-  document.getElementById('ldTotal').textContent = fmtAmt(st.total);
+  document.getElementById('ldCount').textContent = activeList.length;
+  document.getElementById('ldTotal').textContent = fmtAmt(total);
+  document.getElementById('ldPeriodLabel').textContent = periodLabel(f);
   document.getElementById('ldBody').innerHTML = list.map(d=>
-    '<tr><td class="muted">'+d.no+'</td><td>'+d.date+'</td><td>'+d.tithi+'</td><td class="muted">'+d.type+'</td><td class="amount">'+fmtAmt(d.amount)+'</td></tr>'
-  ).join('');
+    '<tr'+(d.cancelled?' class="row-cancelled"':'')+'><td class="muted">'+d.no+'</td><td>'+d.date+'</td><td>'+d.tithi+'</td><td class="muted">'+d.type+'</td><td class="amount">'+fmtAmt(d.amount)+'</td>'+
+    '<td>'+(d.cancelled?'<span class="badge cancelled">रद्द</span>':'<span class="badge paid">जमा</span>')+'</td></tr>'
+  ).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px;">या कालावधीत कोणतीही देणगी नाही</td></tr>';
+}
+/* ---- HTML → PDF: renders the real page (browser Marathi fonts) because jsPDF's built-in fonts cannot draw Devanagari ---- */
+async function htmlToPdf(srcEl, opts){
+  opts = opts || {};
+  if(!window.html2canvas || !window.jspdf) throw new Error('pdf-libs-missing');
+  const holder = document.createElement('div');
+  holder.style.cssText = 'position:fixed;left:-12000px;top:0;background:#fff;pointer-events:none;';
+  const clone = srcEl.cloneNode(true);
+  clone.removeAttribute('id');
+  clone.style.width = (opts.widthPx||794)+'px';
+  clone.style.maxWidth = 'none'; clone.style.margin = '0'; clone.style.boxShadow = 'none'; clone.style.animation = 'none';
+  clone.querySelectorAll('.table-wrap').forEach(t=>{ t.style.maxHeight='none'; t.style.overflow='visible'; });
+  clone.querySelectorAll('thead th').forEach(t=>{ t.style.position='static'; });
+  holder.appendChild(clone); document.body.appendChild(holder);
+  try{
+    if(document.fonts && document.fonts.ready) await document.fonts.ready;
+    const scale = 2;
+    const canvas = await html2canvas(clone, {scale:scale, backgroundColor:'#ffffff', useCORS:true, logging:false});
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({unit:'mm', format:opts.format||'a4', orientation:'portrait'});
+    const pw = doc.internal.pageSize.getWidth(), ph = doc.internal.pageSize.getHeight();
+    const m = (opts.margin==null) ? 8 : opts.margin;
+    if(opts.single){
+      const maxW = pw-2*m, maxH = ph-2*m;
+      let w = maxW, h = w*canvas.height/canvas.width;
+      if(h>maxH){ h = maxH; w = h*canvas.width/canvas.height; }
+      doc.addImage(canvas.toDataURL('image/jpeg',0.96),'JPEG',(pw-w)/2,m,w,h);
+    } else {
+      const imgW = pw-2*m;
+      const pxPerMm = canvas.width/imgW;
+      const pageH = Math.floor((ph-2*m)*pxPerMm);
+      const top = clone.getBoundingClientRect().top;
+      const breaks = Array.from(clone.querySelectorAll('tbody tr')).map(tr=>Math.round((tr.getBoundingClientRect().bottom-top)*scale));
+      let y=0, first=true;
+      while(y<canvas.height){
+        let end = Math.min(y+pageH, canvas.height);
+        if(end<canvas.height){
+          const cand = breaks.filter(b=>b>y+pageH*0.5 && b<=end);
+          if(cand.length) end = cand[cand.length-1];
+        }
+        const sl = document.createElement('canvas');
+        sl.width = canvas.width; sl.height = end-y;
+        sl.getContext('2d').drawImage(canvas,0,y,canvas.width,end-y,0,0,canvas.width,end-y);
+        if(!first) doc.addPage();
+        doc.addImage(sl.toDataURL('image/jpeg',0.96),'JPEG',m,m,imgW,(end-y)/pxPerMm);
+        first=false; y=end;
+      }
+    }
+    doc.save(opts.filename);
+  } finally { holder.remove(); }
+}
+async function pdfWithFallback(buildFn, okMsg, printFallback){
+  if(!window.html2canvas || !window.jspdf){
+    showToast('PDF लायब्ररी उपलब्ध नाही (इंटरनेट तपासा) — प्रिंट → PDF जतन करा वापरा');
+    if(printFallback) printFallback();
+    return;
+  }
+  showToast('PDF तयार होत आहे…');
+  try{ await buildFn(); showToast(okMsg); }
+  catch(e){ console.error(e); showToast('PDF तयार करताना अडचण आली — प्रिंट → PDF जतन करा वापरा'); }
 }
 function downloadYajamanLedgerPDF(){
   if(!currentProfileId) return;
   const y = STORE.yajaman.find(x=>x.id===currentProfileId);
-  if(!y || !window.jspdf){ showToast('PDF लायब्ररी लोड होत आहे, पुन्हा प्रयत्न करा'); return; }
-  const st = yajamanStats(y.id);
-  const list = donationsFor(y.id).slice().sort((a,b)=>(a.dateISO||'').localeCompare(b.dateISO||''));
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({unit:'mm', format:'a4'});
-  const kesari=[194,65,12];
-  doc.setTextColor(...kesari); doc.setFontSize(15);
-  doc.text('श्री संत सखाराम महाराज संस्थान, अमळनेर', 105, 16, {align:'center'});
-  doc.setFontSize(11); doc.text('यजमान इतिहास — '+y.name+' ('+y.id+')', 105, 24, {align:'center'});
-  doc.setFontSize(9); doc.setTextColor(80,80,80);
-  doc.text('मोबाईल: '+(y.mobile||'-')+'   गाव: '+(y.village||'-')+'   तालुका: '+(y.taluka||'-'), 105, 30, {align:'center'});
-  doc.autoTable({
-    startY:36,
-    head:[['पावती','दिनांक','तिथी','प्रकार','रक्कम']],
-    body:list.map(d=>[d.no,d.date,d.tithi,d.type,fmtAmt(d.amount)]),
-    headStyles:{fillColor:[194,65,12]},
-    styles:{font:'helvetica', fontSize:9}
-  });
-  const finalY = doc.lastAutoTable.finalY || 36;
-  doc.setFontSize(11); doc.setTextColor(...kesari);
-  doc.text('एकूण देणगी: '+fmtAmt(st.total)+'  |  एकूण पावत्या: '+st.count, 200, finalY+10, {align:'right'});
-  doc.save('यजमान-इतिहास-'+y.id+'.pdf');
-  showToast('यजमान इतिहास PDF डाउनलोड झाला');
+  if(!y) return;
+  renderYajamanLedgerPage(y.id);
+  const el = document.querySelector('#page-yajledger > .panel');
+  return pdfWithFallback(()=>htmlToPdf(el,{widthPx:794, filename:'यजमान-इतिहास-'+y.id+'.pdf'}), 'यजमान इतिहास PDF डाउनलोड झाला', printYajamanLedger);
 }
 
 /* ---- Receipt population / print / download ---- */
+function receiptVerifyText(d){
+  /* ASCII only and short: Marathi text would overflow the QR capacity */
+  return 'SANSTHAN-AMALNER|R:'+d.no+'|A:'+d.amount+'|D:'+(d.dateISO||'')+(d.yajamanId?'|Y:'+d.yajamanId:'');
+}
+function renderReceiptQR(d){
+  const box = document.getElementById('rQrBox');
+  if(!box) return;
+  box.innerHTML = '<i class="ti ti-qrcode"></i>';
+  if(!window.QRCode) return;
+  try{
+    box.innerHTML = '';
+    new QRCode(box, { text: receiptVerifyText(d), width:62, height:62, colorDark:'#8A6A1F', colorLight:'#FFFDF8', correctLevel: QRCode.CorrectLevel.M });
+  }catch(e){
+    console.warn('QR failed', e);
+    box.innerHTML = '<i class="ti ti-qrcode"></i>';
+  }
+}
 function fillReceipt(d){
   document.getElementById('rNo').textContent = d.no;
   document.getElementById('rDate').textContent = d.date;
@@ -1392,6 +1892,17 @@ function fillReceipt(d){
   const row = document.getElementById('rYajIdRow');
   if(d.yajamanId){ row.style.display='flex'; document.getElementById('rYajId').textContent = d.yajamanId; }
   else{ row.style.display='none'; }
+  const setRow = (rowId, valId, val)=>{ const r=document.getElementById(rowId); if(val){ r.style.display='flex'; document.getElementById(valId).textContent=val; } else { r.style.display='none'; } };
+  setRow('rGotraRow','rGotra', d.gotra);
+  setRow('rSamarthRow','rSamarth', d.samarth);
+  document.getElementById('rTaluka').textContent = d.taluka || '-';
+  document.getElementById('rDistrict').textContent = d.district || '-';
+  document.getElementById('rPincode').textContent = d.pincode || '-';
+  document.getElementById('rRefLabel').textContent = (d.type==='चेक') ? 'चेक क्रमांक' : 'UPI / व्यवहार क्र.';
+  setRow('rRefRow','rRef', d.paymentRef);
+  const stamp = document.getElementById('rCancelStamp');
+  if(stamp) stamp.style.display = d.cancelled ? 'block' : 'none';
+  renderReceiptQR(d);
 }
 function viewReceipt(no){
   const d = STORE.donations.find(x=>x.no===no);
@@ -1407,39 +1918,24 @@ function makeReceiptFromForm(){
   const record = saveDonation();
   if(record){ fillReceipt(record); goTo('receipt'); }
 }
-function downloadReceiptPDF(no){
+function finalizeDonation(){
+  const record = saveDonation(true);
+  if(record){ fillReceipt(record); goTo('receipt'); }
+}
+function onDonTypeChange(){
+  const t = document.getElementById('donType').value;
+  const wrap = document.getElementById('donPaymentRefWrap');
+  wrap.style.display = (t==='रोख') ? 'none' : '';
+  document.getElementById('donPaymentRefLabel').textContent = (t==='चेक') ? 'चेक क्रमांक' : 'UPI संदर्भ क्र. / Transaction ID';
+  if(t==='रोख') document.getElementById('donPaymentRef').value='';
+}
+async function downloadReceiptPDF(no){
   const d = STORE.donations.find(x=>x.no===no);
   if(!d) return;
-  if(!window.jspdf){ showToast('PDF लायब्ररी लोड होत आहे, पुन्हा प्रयत्न करा'); return; }
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({unit:'mm', format:[100,150]});
-  const kesari=[194,65,12], gold=[176,141,50], muted=[107,114,128], dark=[31,41,55];
-  doc.setDrawColor(...gold); doc.setLineWidth(0.6);
-  doc.rect(4,4,92,142);
-  doc.setTextColor(...gold); doc.setFontSize(9); doc.text('॥ श्री ॥', 50, 14, {align:'center'});
-  doc.setTextColor(...kesari); doc.setFontSize(13); doc.text('श्री संत सखाराम महाराज संस्थान', 50, 21, {align:'center'});
-  doc.setTextColor(...muted); doc.setFontSize(8); doc.text('अमळनेर, जि. जळगाव', 50, 26, {align:'center'});
-  doc.setDrawColor(...gold); doc.line(12,30,88,30);
-  doc.setTextColor(...kesari); doc.setFontSize(11); doc.text('देणगी पावती', 50, 38, {align:'center'});
-  doc.setFontSize(8); doc.setTextColor(...muted);
-  doc.text('पावती क्र.: '+d.no, 12, 46);
-  doc.text('दिनांक: '+d.date, 88, 46, {align:'right'});
-  let y=56;
-  const rows = [['यजमानाचे नाव', d.name],['गाव', d.village],['तिथी', d.tithi],['देणगी प्रकार', d.type]];
-  doc.setFontSize(9);
-  rows.forEach(r=>{
-    doc.setTextColor(...muted); doc.text(r[0], 12, y);
-    doc.setTextColor(...dark); doc.text(String(r[1]), 88, y, {align:'right'});
-    y+=8;
-  });
-  y+=4;
-  doc.setDrawColor(...gold); doc.setFillColor(251,235,224); doc.roundedRect(12,y,76,16,2,2,'FD');
-  doc.setTextColor(120,95,31); doc.setFontSize(8); doc.text('एकूण देणगी', 50, y+6, {align:'center'});
-  doc.setTextColor(...kesari); doc.setFontSize(14); doc.text(fmtAmt(d.amount), 50, y+13, {align:'center'});
-  y+=28;
-  doc.setTextColor(...muted); doc.setFontSize(7); doc.text('आपल्या उदार देणगीबद्दल संस्थान आभारी आहे.', 50, y, {align:'center', maxWidth:80});
-  doc.save('पावती-'+d.no+'.pdf');
-  showToast('पावती PDF डाउनलोड झाली');
+  fillReceipt(d);
+  await new Promise(r=>setTimeout(r,400));   // let the QR image finish drawing
+  const el = document.querySelector('#page-receipt .receipt');
+  return pdfWithFallback(()=>htmlToPdf(el,{widthPx:620, format:'a5', single:true, margin:6, filename:'पावती-'+d.no+'.pdf'}), 'पावती PDF डाउनलोड झाली', ()=>printReceipt(no));
 }
 
 /* ---- Reports: filter, PDF, Excel ---- */
@@ -1456,7 +1952,7 @@ function currentReportFilter(){
 }
 function filteredDonationsForReport(){
   const f = currentReportFilter();
-  return STORE.donations.filter(d=>{
+  return activeDonations().filter(d=>{
     if(!d.dateISO) return f.type==='all';
     const dt = new Date(d.dateISO+'T00:00:00');
     if(f.type==='all') return true;
@@ -1476,6 +1972,16 @@ function generateReport(){
   ).join('') || '<tr><td colspan="6" class="muted" style="text-align:center;padding:20px;">या कालावधीत कोणतीही नोंद नाही</td></tr>';
   const total = list.reduce((s,d)=>s+Number(d.amount||0),0);
   document.getElementById('rpTotal').textContent = 'एकूण देणगी: '+fmtAmt(total);
+  const groupBy = (keyFn)=>{ const m={}; list.forEach(d=>{ const k=keyFn(d); (m[k]=m[k]||{count:0,amount:0}); m[k].count++; m[k].amount+=Number(d.amount||0); }); return m; };
+  const byDate = groupBy(d=>d.dateISO||'-');
+  document.getElementById('rpDateBody').innerHTML = Object.keys(byDate).sort().map(k=>
+    '<tr><td>'+(k==='-'?'-':fmtDateMr(k))+'</td><td class="num">'+byDate[k].count+'</td><td class="amount">'+fmtAmt(byDate[k].amount)+'</td></tr>'
+  ).join('') || '<tr><td colspan="3" class="muted" style="text-align:center;padding:16px;">या कालावधीत कोणतीही नोंद नाही</td></tr>';
+  const byTithi = groupBy(d=>d.tithi||'-');
+  const tOrder = Object.keys(byTithi).sort((a,b)=>{ const ia=ALL_TITHIS.indexOf(a), ib=ALL_TITHIS.indexOf(b); return (ia<0?9999:ia)-(ib<0?9999:ib); });
+  document.getElementById('rpTithiBody').innerHTML = tOrder.map(k=>
+    '<tr><td>'+k+'</td><td class="num">'+byTithi[k].count+'</td><td class="amount">'+fmtAmt(byTithi[k].amount)+'</td></tr>'
+  ).join('') || '<tr><td colspan="3" class="muted" style="text-align:center;padding:16px;">या कालावधीत कोणतीही नोंद नाही</td></tr>';
 
   if(!window.Chart) return;
   const tithiTotals = {};
@@ -1503,27 +2009,17 @@ onReportPeriodChange();
 generateReport();
 
 function downloadReportPDF(){
-  const list = filteredDonationsForReport();
-  if(!window.jspdf){ showToast('PDF लायब्ररी लोड होत आहे, पुन्हा प्रयत्न करा'); return; }
-  const { jsPDF } = window.jspdf;
-  const doc = new jsPDF({unit:'mm', format:'a4'});
-  const kesari=[194,65,12];
-  doc.setTextColor(...kesari); doc.setFontSize(15);
-  doc.text('श्री संत सखाराम महाराज संस्थान, अमळनेर', 105, 16, {align:'center'});
-  doc.setFontSize(12); doc.text(document.getElementById('rpPeriodLabel').textContent + ' — देणगी अहवाल', 105, 24, {align:'center'});
-  doc.autoTable({
-    startY:30,
-    head:[['पावती','यजमान','गाव','तिथी','दिनांक','रक्कम']],
-    body:list.map(d=>[d.no,d.name,d.village,d.tithi,d.date,fmtAmt(d.amount)]),
-    headStyles:{fillColor:[194,65,12]},
-    styles:{font:'helvetica', fontSize:9}
-  });
-  const total = list.reduce((s,d)=>s+Number(d.amount||0),0);
-  const finalY = doc.lastAutoTable.finalY || 30;
-  doc.setFontSize(11); doc.setTextColor(...kesari);
-  doc.text('एकूण देणगी: '+fmtAmt(total), 200, finalY+10, {align:'right'});
-  doc.save('देणगी-अहवाल.pdf');
-  showToast('अहवाल PDF डाउनलोड झाला');
+  generateReport();
+  const wrap = document.createElement('div');
+  ['reportPrintArea','rpDatePanel','rpTithiPanel'].forEach(id=>{ wrap.appendChild(document.getElementById(id).cloneNode(true)); });
+  wrap.querySelectorAll('[id]').forEach(n=>n.removeAttribute('id'));
+  const label = document.getElementById('rpPeriodLabel').textContent.replace(/\s+/g,'-');
+  return pdfWithFallback(()=>htmlToPdf(wrap,{widthPx:794, filename:'देणगी-अहवाल-'+label+'.pdf'}), 'अहवाल PDF डाउनलोड झाला', ()=>window.print());
+}
+function downloadSmaranPatraPDF(){
+  const el = document.getElementById('spLetter');
+  const nm = (document.getElementById('spName').textContent||'').trim().replace(/\s+/g,'-');
+  return pdfWithFallback(()=>htmlToPdf(el,{widthPx:794, single:true, filename:'स्मरणपत्र-'+nm+'.pdf'}), 'स्मरणपत्र PDF डाउनलोड झाले', ()=>window.print());
 }
 function downloadReportExcel(){
   const list = filteredDonationsForReport();
@@ -1675,6 +2171,9 @@ function setupTranslit(input){
   });
 }
 document.querySelectorAll('.mr-translit').forEach(setupTranslit);
+populateTithiSelect();
+onDonTypeChange();
+loadSettingsForm();
 
 /* ================= RECORD CLEANUP / DELETE OLD RECORDS ================= */
 function updateCleanupCounts(){
@@ -1712,6 +2211,49 @@ function deleteAllDonations(){
   updateCleanupCounts();
   showToast('सर्व देणगी नोंदी हटवल्या');
 }
+/* ---- Settings (institution + bank details) ---- */
+function loadSettingsForm(){
+  const st = STORE.settings;
+  const map = {setInstName:'instName', setInstVillage:'instVillage', setInstDistrict:'instDistrict', setInstContact:'instContact', setInstEmail:'instEmail',
+    setBankName:'bankName', setBankHolder:'bankHolder', setBankAccount:'bankAccount', setBankIFSC:'bankIFSC', setBankBranch:'bankBranch'};
+  Object.keys(map).forEach(id=>{ const el=document.getElementById(id); if(el) el.value = st[map[id]]||''; });
+}
+function saveSettings(){
+  const map = {setInstName:'instName', setInstVillage:'instVillage', setInstDistrict:'instDistrict', setInstContact:'instContact', setInstEmail:'instEmail',
+    setBankName:'bankName', setBankHolder:'bankHolder', setBankAccount:'bankAccount', setBankIFSC:'bankIFSC', setBankBranch:'bankBranch'};
+  Object.keys(map).forEach(id=>{ STORE.settings[map[id]] = document.getElementById(id).value.trim(); });
+  persist();
+  showToast('सेटिंग्ज जतन झाल्या');
+}
+
+/* ---- Reminder letter (स्मरणपत्र) ---- */
+function openSmaranPatra(){
+  const y = STORE.yajaman.find(x=>x.id===currentProfileId);
+  if(!y) return;
+  const pl = pledgeStats(y);
+  if(!pl.pledge){
+    showInfoModal('या यजमानाची संकल्पित रक्कम नोंदवलेली नाही. स्मरणपत्रासाठी प्रथम "यजमान संपादन" मध्ये संकल्पित रक्कम भरा.');
+    return;
+  }
+  const st = STORE.settings;
+  const set = (id,val)=>{ document.getElementById(id).textContent = val; };
+  const instFull = (st.instName||'')+(st.instVillage?', '+st.instVillage:'');
+  set('spInst', instFull); set('spInst2', instFull);
+  set('spDate', fmtDateMr(todayISO()));
+  set('spName', y.name);
+  set('spGotraWrap', y.gotra ? '(गोत्र: '+y.gotra+')' : '');
+  set('spAddr', [y.village, y.taluka?('ता. '+y.taluka):'', y.district?('जि. '+y.district):'', y.pincode].filter(Boolean).join(', '));
+  set('spPledge', fmtAmt(pl.pledge));
+  set('spPledgeWords', 'रुपये '+amountToMarathiWords(pl.pledge)+' मात्र');
+  set('spPaid', Number(pl.paid).toLocaleString('en-IN'));
+  set('spDue', Number(pl.due).toLocaleString('en-IN'));
+  const lastSamarth = donationsFor(y.id).filter(d=>d.samarth).slice(-1)[0];
+  set('spSamarth', lastSamarth ? lastSamarth.samarth+' ' : 'आपल्या आप्तेष्टांच्या/नातेवाईकांच्या स्मरणार्थ ');
+  set('spBankName', st.bankName||'—'); set('spBankHolder', st.bankHolder||'—'); set('spBankAccount', st.bankAccount||'—');
+  set('spBankIFSC', st.bankIFSC||'—'); set('spBankBranch', st.bankBranch||'—');
+  goTo('smaranpatra');
+}
+
 function downloadBackupJSON(){
   try{
     const blob = new Blob([JSON.stringify(STORE, null, 2)], {type:'application/json'});
