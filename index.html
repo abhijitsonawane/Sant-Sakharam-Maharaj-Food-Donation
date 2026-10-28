@@ -339,6 +339,49 @@
     .receipt{box-shadow:none;}
   }
 
+
+  /* ===== A4 receipt sheet: office copy + donor copy ===== */
+  .receipt-sheet{width:794px;max-width:100%;margin:0 auto;background:#fff;padding:0;}
+  .rc-cut{display:flex;align-items:center;gap:10px;margin:10px 0;color:#6B7280;font-size:11.5px;}
+  .rc-cut::before,.rc-cut::after{content:"";flex:1;border-top:1.5px dashed #9CA3AF;}
+  .receipt.rc2{width:100%;padding:0 28px 12px;box-shadow:none;outline-offset:-6px;}
+  .rc2 .r-ribbon{margin:0 -28px 8px;height:6px;}
+  .rc2 .r-corner{width:20px;height:20px;}
+  .rc2 .r-watermark{font-size:150px;opacity:0.03;}
+  .rc2 .r-watermark2{font-size:44px;top:70%;opacity:0.07;}
+  .rc2-copy{position:absolute;top:16px;right:24px;font-size:11px;font-weight:600;color:#7A5F1F;border:1px solid var(--gold);border-radius:12px;padding:2px 10px;background:#FFFDF8;z-index:2;}
+  .rc2-head{text-align:center;position:relative;z-index:1;}
+  .rc2-head .shri{color:var(--gold);font-size:12px;font-weight:600;letter-spacing:1px;}
+  .rc2-head .inst{font-size:18px;font-weight:600;color:var(--kesari);line-height:1.35;}
+  .rc2-head .place{font-size:12.5px;color:var(--text);margin-top:1px;}
+  .rc2-head .trust{font-size:12px;color:#7A5F1F;font-weight:600;margin-top:2px;}
+  .rc2-titlebar{text-align:center;margin:8px 0 6px;position:relative;z-index:1;}
+  .rc2-title{display:inline-block;font-size:16px;font-weight:600;color:var(--kesari);letter-spacing:1px;border-top:1px solid var(--gold);border-bottom:1px solid var(--gold);padding:1px 22px;}
+  .rc2-meta{display:flex;justify-content:space-between;font-size:13px;color:var(--muted);margin-bottom:4px;position:relative;z-index:1;}
+  .rc2-meta .val{color:var(--text);font-weight:600;}
+  .rc2-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 28px;position:relative;z-index:1;}
+  .rc2-row{display:flex;justify-content:space-between;gap:10px;padding:4px 0;border-bottom:1px dashed var(--border);font-size:13px;}
+  .rc2-row .label{color:var(--muted);white-space:nowrap;}
+  .rc2-row .value{font-weight:600;color:var(--text);text-align:right;}
+  .rc2-row.full{grid-column:1 / -1;}
+  .rc2-amt{margin-top:8px;padding:8px 16px;display:flex;align-items:center;justify-content:space-between;gap:16px;text-align:left;border-radius:8px;position:relative;z-index:1;background:linear-gradient(135deg,var(--kesari-tint) 0%,#FFF7EE 60%,#FFFCF5 100%);border:1px solid var(--gold);}
+  .rc2-amt .amt{font-size:26px;font-weight:700;color:var(--kesari);white-space:nowrap;}
+  .rc2-amt .words{font-size:13px;color:var(--text);text-align:right;line-height:1.5;}
+  .rc2-amt .words b{color:#7A5F1F;}
+  .rc2-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:8px;position:relative;z-index:1;}
+  .rc2-foot .thanks{font-size:11.5px;color:var(--muted);font-style:italic;text-align:center;flex:1;padding:0 14px;}
+  .rc2 .qr-box{width:62px;height:62px;}
+  .rc2 .sign-line{width:150px;}
+  @media print{
+    @page{size:A4;margin:6mm;}
+    .content{padding:0 !important;}
+    .main{display:block !important;}
+    .receipt-sheet{width:198mm !important;max-width:none;}
+    .rc-cut{page-break-inside:avoid;}
+    .receipt.rc2{break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+  }
+
   /* ===== TOAST ===== */
   .toast{
     position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);
@@ -820,13 +863,26 @@
 
     <!-- ================= BACKUP ================= -->
     <section class="page-section" id="page-backup">
-      <div class="simple-panel">
-        <h2>डेटा बॅकअप</h2>
-        <p>संपूर्ण डेटाबेसचा सुरक्षित बॅकअप घ्या. बॅकअप फाईल आपल्या डिव्हाइसवर सेव्ह केली जाईल.</p>
-        <button class="btn btn-primary"><i class="ti ti-database"></i>आता बॅकअप घ्या</button>
-        <div class="backup-info"><span class="label">शेवटचा बॅकअप</span><span class="value">21 ऑगस्ट 2026, 09:40 AM</span></div>
-        <div class="backup-info"><span class="label">फाईल आकार</span><span class="value">18.4 MB</span></div>
-        <div class="backup-info"><span class="label">एकूण नोंदी</span><span class="value">3,842</span></div>
+      <div class="simple-panel" style="max-width:760px;">
+        <h2><i class="ti ti-database" style="color:var(--kesari);"></i>&nbsp; डेटा बॅकअप</h2>
+        <p>सर्व माहिती फक्त <b>या ब्राउझरमध्ये</b> साठवली जाते. ब्राउझर डेटा साफ केल्यास किंवा दुसरा संगणक वापरल्यास माहिती दिसणार नाही — म्हणून नियमित बॅकअप घ्या आणि फाईल सुरक्षित ठिकाणी (पेन ड्राइव्ह / गूगल ड्राइव्ह) ठेवा.</p>
+        <button class="btn btn-primary" onclick="downloadBackupJSON()"><i class="ti ti-download"></i>आता बॅकअप घ्या</button>
+        <div class="backup-info" style="margin-top:18px;"><span class="label">शेवटचा बॅकअप</span><span class="value" id="bkLast">—</span></div>
+        <div class="backup-info"><span class="label">देणगी नोंदी</span><span class="value" id="bkDon">0</span></div>
+        <div class="backup-info"><span class="label">यजमान</span><span class="value" id="bkYaj">0</span></div>
+        <div class="backup-info"><span class="label">खर्च नोंदी</span><span class="value" id="bkExp">0</span></div>
+        <div class="backup-info"><span class="label">अंदाजे फाईल आकार</span><span class="value" id="bkSize">—</span></div>
+
+        <div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+          <h2><i class="ti ti-upload" style="color:var(--kesari);"></i>&nbsp; बॅकअपमधून पुनर्संचयित करा (Restore)</h2>
+          <p>पूर्वी घेतलेली <b>.json</b> बॅकअप फाईल निवडा. सध्याचा सर्व डेटा त्या फाईलने बदलला जाईल; बदलण्यापूर्वी सध्याच्या डेटाचा बॅकअप आपोआप डाउनलोड होईल.</p>
+          <div style="margin:10px 0;font-size:14px;">
+            <label style="display:block;margin-bottom:6px;"><input type="radio" name="restoreMode" value="merge" checked> <b>नवीन नोंदी जोडा (सुरक्षित)</b> — सध्याचा डेटा तसाच राहतो, दुबार नोंदी वगळल्या जातात</label>
+            <label style="display:block;"><input type="radio" name="restoreMode" value="replace"> <b>सर्व डेटा बदला</b> — नवीन संगणकावर पूर्ण पुनर्संचयनासाठी</label>
+          </div>
+          <input type="file" id="restoreFile" accept=".json,application/json" style="display:none;" onchange="restoreBackupFile(this)">
+          <button class="btn btn-gold" onclick="document.getElementById('restoreFile').click()"><i class="ti ti-upload"></i>बॅकअप फाईल निवडा</button>
+        </div>
       </div>
     </section>
 
@@ -837,6 +893,9 @@
           <h2>संस्थान माहिती</h2>
           <div class="grid-2">
             <div class="field full"><label>संस्थानाचे नाव</label><input type="text" id="setInstName"></div>
+            <div class="field full"><label>पावतीवरील संस्थानाचे नाव (हेडर)</label><input type="text" id="setReceiptName"></div>
+            <div class="field"><label>पावतीवरील पत्ता ओळ</label><input type="text" id="setReceiptPlace"></div>
+            <div class="field"><label>न्यास नोंद क्रमांक</label><input type="text" id="setTrustReg"></div>
             <div class="field"><label>गाव</label><input type="text" id="setInstVillage"></div>
             <div class="field"><label>जिल्हा</label><input type="text" id="setInstDistrict"></div>
             <div class="field"><label>संपर्क क्रमांक</label><input type="text" id="setInstContact" placeholder="कार्यालयीन क्रमांक"></div>
@@ -946,64 +1005,11 @@
 
     <!-- ================= RECEIPT (linked from quick actions) ================= -->
     <section class="page-section" id="page-receipt">
-      <div class="receipt-actions">
-        <button class="btn btn-secondary" onclick="window.print()"><i class="ti ti-printer"></i>प्रिंट करा</button>
+      <div class="receipt-actions" style="gap:10px;">
+        <button class="btn btn-secondary" onclick="downloadCurrentReceiptPDF()"><i class="ti ti-file-type-pdf"></i>PDF डाउनलोड</button>
+        <button class="btn btn-primary" onclick="window.print()"><i class="ti ti-printer"></i>प्रिंट (A4 — २ प्रती)</button>
       </div>
-      <div class="receipt-wrap">
-        <div class="receipt">
-          <div class="r-ribbon"></div>
-          <div class="r-corner tl"></div>
-          <div class="r-corner tr"></div>
-          <div class="r-corner bl"></div>
-          <div class="r-corner br"></div>
-          <div class="r-watermark serif">श्री</div>
-          <div class="r-seal"><div class="r-seal-inner"><span class="t1">प्रमाणित</span><span class="t2">VERIFIED</span></div></div>
-          <div class="r-watermark2 serif">समाधी मंदिर</div>
-          <div class="r-cancel-stamp" id="rCancelStamp" style="display:none;">रद्द<span class="en">CANCELLED</span></div>
-
-          <div class="r-header">
-            <div class="r-emblem serif">ॐ</div>
-            <div class="shri">॥ श्री ॥</div>
-            <div class="inst serif">श्री संत सखाराम महाराज संस्थान</div>
-            <div class="place">अमळनेर, जि. जळगाव</div>
-          </div>
-
-          <div class="r-divider-orn"><span></span><i class="ti ti-flower"></i><span></span></div>
-
-          <div class="r-title serif">देणगी पावती</div>
-
-          <div class="r-meta"><div>पावती क्र. <span class="val" id="rNo">000125</span></div><div>दिनांक <span class="val" id="rDate">१८ जुलै २०२६</span></div></div>
-          <div class="r-row" id="rYajIdRow" style="display:none;"><span class="label">यजमान ID</span><span class="value" id="rYajId">—</span></div>
-
-          <div>
-            <div class="r-row"><span class="label">यजमानाचे नाव</span><span class="value" id="rName">अजय कुलकर्णी</span></div>
-            <div class="r-row" id="rGotraRow" style="display:none;"><span class="label">गोत्र</span><span class="value" id="rGotra">—</span></div>
-            <div class="r-row" id="rSamarthRow" style="display:none;"><span class="label">समर्थनार्थ</span><span class="value" id="rSamarth">—</span></div>
-            <div class="r-grid">
-              <div class="r-row"><span class="label">गाव</span><span class="value" id="rVillage">अमळनेर</span></div>
-              <div class="r-row"><span class="label">तालुका</span><span class="value" id="rTaluka">—</span></div>
-              <div class="r-row"><span class="label">जिल्हा</span><span class="value" id="rDistrict">—</span></div>
-              <div class="r-row"><span class="label">पिनकोड</span><span class="value" id="rPincode">—</span></div>
-            </div>
-            <div class="r-row"><span class="label">तिथी</span><span class="value" id="rTithi">आषाढ शु. नवमी</span></div>
-            <div class="r-row"><span class="label">देणगी प्रकार</span><span class="value" id="rType">रोख</span></div>
-            <div class="r-row" id="rRefRow" style="display:none;"><span class="label" id="rRefLabel">संदर्भ क्र.</span><span class="value" id="rRef">—</span></div>
-          </div>
-
-          <div class="r-amount-box">
-            <div class="r-amount-label">एकूण देणगी</div>
-            <div class="r-amount-value" id="rAmount">₹11,000</div>
-          </div>
-
-          <div class="r-footer">
-            <div class="qr-box" id="rQrBox"><i class="ti ti-qrcode"></i></div>
-            <div><div class="sign-line"></div><div class="sign-label">अधिकृत स्वाक्षरी</div></div>
-          </div>
-
-          <div class="r-divider-orn small"><span></span><i class="ti ti-flower" style="font-size:11px;"></i><span></span></div>
-          <div class="r-thanks">आपल्या उदार देणगीबद्दल संस्थान आभारी आहे.</div>
-        </div>
-      </div>
+      <div class="receipt-wrap"><div class="receipt-sheet" id="receiptSheet"></div></div>
     </section>
 
   </div>
@@ -1038,6 +1044,12 @@ function goTo(page){
   document.getElementById('pageTitle').textContent = titles[page] || page;
   document.getElementById('sidebar').classList.remove('open');
   if(page==='settings' && typeof updateCleanupCounts==='function') updateCleanupCounts();
+  if(page==='backup' && typeof updateBackupInfo==='function') updateBackupInfo();
+  if(page==='receipt' && !document.getElementById('receiptSheet').innerHTML.trim()){
+    const last = activeDonations().slice(-1)[0];
+    if(last) fillReceipt(last);
+    else document.getElementById('receiptSheet').innerHTML = '<div class="empty-state"><i class="ti ti-receipt"></i>अजून कोणतीही पावती नाही — नवीन देणगी नोंदवा.</div>';
+  }
 }
 document.querySelectorAll('.nav-item[data-page]').forEach(item=>{
   item.addEventListener('click', ()=> goTo(item.dataset.page));
@@ -1177,7 +1189,8 @@ function migrateStore(store){
   store.nextExpense = store.nextExpense || 1;
   store.settings = Object.assign({
     instName:'श्री संत सखाराम महाराज संस्थान', instVillage:'अमळनेर', instDistrict:'जळगाव', instContact:'', instEmail:'',
-    bankName:'', bankHolder:'', bankAccount:'', bankIFSC:'', bankBranch:''
+    bankName:'', bankHolder:'', bankAccount:'', bankIFSC:'', bankBranch:'',
+    receiptName:'श्री. सद्गुरू सखाराम महाराज विठ्ठल रुख्मणी संस्थान', receiptPlace:'अमळनेर जि. जळगाव', trustReg:'अ /४६५/जळगाव'
   }, store.settings || {});
   let changed = false;
   store.yajaman.forEach(y=>{
@@ -1868,42 +1881,64 @@ function receiptVerifyText(d){
   /* ASCII only and short: Marathi text would overflow the QR capacity */
   return 'SANSTHAN-AMALNER|R:'+d.no+'|A:'+d.amount+'|D:'+(d.dateISO||'')+(d.yajamanId?'|Y:'+d.yajamanId:'');
 }
-function renderReceiptQR(d){
-  const box = document.getElementById('rQrBox');
-  if(!box) return;
-  box.innerHTML = '<i class="ti ti-qrcode"></i>';
-  if(!window.QRCode) return;
-  try{
-    box.innerHTML = '';
-    new QRCode(box, { text: receiptVerifyText(d), width:62, height:62, colorDark:'#8A6A1F', colorLight:'#FFFDF8', correctLevel: QRCode.CorrectLevel.M });
-  }catch(e){
-    console.warn('QR failed', e);
-    box.innerHTML = '<i class="ti ti-qrcode"></i>';
-  }
+
+function rupeesInWords(amount){
+  const a = Number(amount)||0;
+  const rs = Math.floor(a), ps = Math.round((a-rs)*100);
+  let w = 'रुपये '+amountToMarathiWords(rs);
+  if(ps) w += ' व '+amountToMarathiWords(ps)+' पैसे';
+  return w+' मात्र';
 }
+function escHtml(v){ return String(v==null?'':v).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function receiptHTML(d, copyLabel){
+  const st = STORE.settings;
+  const row = (l,v,full)=> v ? '<div class="rc2-row'+(full?' full':'')+'"><span class="label">'+l+'</span><span class="value">'+escHtml(v)+'</span></div>' : '';
+  const refLabel = (d.type==='चेक') ? 'चेक क्रमांक' : 'UPI / व्यवहार क्र.';
+  return '<div class="receipt rc2">'+
+    '<div class="r-ribbon"></div>'+
+    '<div class="r-corner tl"></div><div class="r-corner tr"></div><div class="r-corner bl"></div><div class="r-corner br"></div>'+
+    '<div class="r-watermark serif">श्री</div><div class="r-watermark2 serif">समाधी मंदिर</div>'+
+    '<div class="rc2-copy">'+escHtml(copyLabel)+'</div>'+
+    (d.cancelled ? '<div class="r-cancel-stamp">रद्द<span class="en">CANCELLED</span></div>' : '')+
+    '<div class="rc2-head"><div class="shri">॥ श्री ॥</div>'+
+      '<div class="inst serif">'+escHtml(st.receiptName)+'</div>'+
+      '<div class="place">'+escHtml(st.receiptPlace)+'</div>'+
+      (st.trustReg ? '<div class="trust">न्यास नोंद क्रमांक : '+escHtml(st.trustReg)+'</div>' : '')+
+    '</div>'+
+    '<div class="rc2-titlebar"><span class="rc2-title serif">देणगी पावती</span></div>'+
+    '<div class="rc2-meta"><div>पावती क्र. <span class="val">'+escHtml(d.no)+'</span></div><div>दिनांक <span class="val">'+escHtml(d.date)+'</span></div></div>'+
+    '<div class="rc2-grid">'+
+      row('यजमान ID', d.yajamanId)+row('यजमानाचे नाव', d.name)+
+      row('गोत्र', d.gotra)+row('समर्थनार्थ', d.samarth)+
+      row('गाव', d.village && d.village!=='-' ? d.village : '')+row('तालुका', d.taluka)+
+      row('जिल्हा', d.district)+row('पिनकोड', d.pincode)+
+      row('तिथी', d.tithi)+row('देणगी प्रकार', d.type)+
+      row(refLabel, d.paymentRef)+
+    '</div>'+
+    '<div class="rc2-amt"><div class="amt">'+escHtml(fmtAmt(d.amount))+'/-</div>'+
+      '<div class="words"><b>अक्षरी :</b> '+escHtml(rupeesInWords(d.amount))+'</div></div>'+
+    '<div class="rc2-foot"><div class="qr-box"><i class="ti ti-qrcode"></i></div>'+
+      '<div class="thanks">आपल्या उदार देणगीबद्दल संस्थान आभारी आहे.</div>'+
+      '<div><div class="sign-line"></div><div class="sign-label">अधिकृत स्वाक्षरी</div></div></div>'+
+  '</div>';
+}
+function renderReceiptQR(d){
+  document.querySelectorAll('#receiptSheet .qr-box').forEach(box=>{
+    if(!window.QRCode) return;
+    try{
+      box.innerHTML = '';
+      new QRCode(box, { text: receiptVerifyText(d), width:56, height:56, colorDark:'#8A6A1F', colorLight:'#FFFDF8', correctLevel: QRCode.CorrectLevel.M });
+    }catch(e){ console.warn('QR failed', e); box.innerHTML = '<i class="ti ti-qrcode"></i>'; }
+  });
+}
+let currentReceiptNo = null;
 function fillReceipt(d){
-  document.getElementById('rNo').textContent = d.no;
-  document.getElementById('rDate').textContent = d.date;
-  document.getElementById('rName').textContent = d.name;
-  document.getElementById('rVillage').textContent = d.village;
-  document.getElementById('rTithi').textContent = d.tithi;
-  document.getElementById('rType').textContent = d.type;
-  document.getElementById('rAmount').textContent = fmtAmt(d.amount);
-  const row = document.getElementById('rYajIdRow');
-  if(d.yajamanId){ row.style.display='flex'; document.getElementById('rYajId').textContent = d.yajamanId; }
-  else{ row.style.display='none'; }
-  const setRow = (rowId, valId, val)=>{ const r=document.getElementById(rowId); if(val){ r.style.display='flex'; document.getElementById(valId).textContent=val; } else { r.style.display='none'; } };
-  setRow('rGotraRow','rGotra', d.gotra);
-  setRow('rSamarthRow','rSamarth', d.samarth);
-  document.getElementById('rTaluka').textContent = d.taluka || '-';
-  document.getElementById('rDistrict').textContent = d.district || '-';
-  document.getElementById('rPincode').textContent = d.pincode || '-';
-  document.getElementById('rRefLabel').textContent = (d.type==='चेक') ? 'चेक क्रमांक' : 'UPI / व्यवहार क्र.';
-  setRow('rRefRow','rRef', d.paymentRef);
-  const stamp = document.getElementById('rCancelStamp');
-  if(stamp) stamp.style.display = d.cancelled ? 'block' : 'none';
+  currentReceiptNo = d.no;
+  document.getElementById('receiptSheet').innerHTML =
+    receiptHTML(d,'कार्यालय प्रत') + '<div class="rc-cut">✂ &nbsp;येथे कापा — देणगीदार प्रत खाली&nbsp; ✂</div>' + receiptHTML(d,'देणगीदार प्रत');
   renderReceiptQR(d);
 }
+function downloadCurrentReceiptPDF(){ if(currentReceiptNo) return downloadReceiptPDF(currentReceiptNo); }
 function viewReceipt(no){
   const d = STORE.donations.find(x=>x.no===no);
   if(d){ fillReceipt(d); goTo('receipt'); }
@@ -1933,9 +1968,9 @@ async function downloadReceiptPDF(no){
   const d = STORE.donations.find(x=>x.no===no);
   if(!d) return;
   fillReceipt(d);
-  await new Promise(r=>setTimeout(r,400));   // let the QR image finish drawing
-  const el = document.querySelector('#page-receipt .receipt');
-  return pdfWithFallback(()=>htmlToPdf(el,{widthPx:620, format:'a5', single:true, margin:6, filename:'पावती-'+d.no+'.pdf'}), 'पावती PDF डाउनलोड झाली', ()=>printReceipt(no));
+  await new Promise(r=>setTimeout(r,450));   // let the QR images finish drawing
+  const el = document.getElementById('receiptSheet');
+  return pdfWithFallback(()=>htmlToPdf(el,{widthPx:794, format:'a4', single:true, margin:6, filename:'पावती-'+d.no+'.pdf'}), 'पावती PDF डाउनलोड झाली', ()=>printReceipt(no));
 }
 
 /* ---- Reports: filter, PDF, Excel ---- */
@@ -2174,6 +2209,7 @@ document.querySelectorAll('.mr-translit').forEach(setupTranslit);
 populateTithiSelect();
 onDonTypeChange();
 loadSettingsForm();
+updateBackupInfo();
 
 /* ================= RECORD CLEANUP / DELETE OLD RECORDS ================= */
 function updateCleanupCounts(){
@@ -2215,12 +2251,12 @@ function deleteAllDonations(){
 function loadSettingsForm(){
   const st = STORE.settings;
   const map = {setInstName:'instName', setInstVillage:'instVillage', setInstDistrict:'instDistrict', setInstContact:'instContact', setInstEmail:'instEmail',
-    setBankName:'bankName', setBankHolder:'bankHolder', setBankAccount:'bankAccount', setBankIFSC:'bankIFSC', setBankBranch:'bankBranch'};
+    setReceiptName:'receiptName', setReceiptPlace:'receiptPlace', setTrustReg:'trustReg', setBankName:'bankName', setBankHolder:'bankHolder', setBankAccount:'bankAccount', setBankIFSC:'bankIFSC', setBankBranch:'bankBranch'};
   Object.keys(map).forEach(id=>{ const el=document.getElementById(id); if(el) el.value = st[map[id]]||''; });
 }
 function saveSettings(){
   const map = {setInstName:'instName', setInstVillage:'instVillage', setInstDistrict:'instDistrict', setInstContact:'instContact', setInstEmail:'instEmail',
-    setBankName:'bankName', setBankHolder:'bankHolder', setBankAccount:'bankAccount', setBankIFSC:'bankIFSC', setBankBranch:'bankBranch'};
+    setReceiptName:'receiptName', setReceiptPlace:'receiptPlace', setTrustReg:'trustReg', setBankName:'bankName', setBankHolder:'bankHolder', setBankAccount:'bankAccount', setBankIFSC:'bankIFSC', setBankBranch:'bankBranch'};
   Object.keys(map).forEach(id=>{ STORE.settings[map[id]] = document.getElementById(id).value.trim(); });
   persist();
   showToast('सेटिंग्ज जतन झाल्या');
@@ -2254,16 +2290,110 @@ function openSmaranPatra(){
   goTo('smaranpatra');
 }
 
-function downloadBackupJSON(){
+function downloadBackupJSON(silent){
   try{
-    const blob = new Blob([JSON.stringify(STORE, null, 2)], {type:'application/json'});
+    STORE.meta = STORE.meta || {};
+    STORE.meta.lastBackup = new Date().toISOString();
+    persist();
+    const payload = { app:'sansthan-backup', version:2, exportedAt: STORE.meta.lastBackup, store: STORE };
+    const blob = new Blob([JSON.stringify(payload, null, 2)], {type:'application/json'});
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = 'sansthan-backup-'+new Date().toISOString().slice(0,10)+'.json';
+    a.href = url; a.download = 'sansthan-backup-'+todayISO()+(silent?'-before-restore':'')+'.json';
     document.body.appendChild(a); a.click(); a.remove();
-    URL.revokeObjectURL(url);
-    showToast('बॅकअप डाउनलोड झाला');
-  }catch(e){ showToast('बॅकअप घेताना अडचण आली'); }
+    setTimeout(()=>URL.revokeObjectURL(url), 4000);
+    if(!silent) showToast('बॅकअप डाउनलोड झाला — फाईल सुरक्षित ठिकाणी ठेवा');
+    updateBackupInfo();
+    return true;
+  }catch(e){ console.error(e); showToast('बॅकअप घेताना अडचण आली'); return false; }
+}
+function updateBackupInfo(){
+  const el = document.getElementById('bkLast');
+  if(!el) return;
+  const last = STORE.meta && STORE.meta.lastBackup;
+  el.textContent = last ? (fmtDateMr(last.slice(0,10))+', '+new Date(last).toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'})) : 'अजून बॅकअप घेतलेला नाही';
+  document.getElementById('bkDon').textContent = STORE.donations.length;
+  document.getElementById('bkYaj').textContent = STORE.yajaman.length;
+  document.getElementById('bkExp').textContent = STORE.expenses.length;
+  const bytes = new Blob([JSON.stringify(STORE)]).size;
+  document.getElementById('bkSize').textContent = bytes>1048576 ? (bytes/1048576).toFixed(1)+' MB' : Math.max(1,Math.round(bytes/1024))+' KB';
+}
+function validateBackup(obj){
+  const data = (obj && typeof obj==='object' && obj.store) ? obj.store : obj;
+  if(!data || typeof data!=='object' || !Array.isArray(data.donations) || !Array.isArray(data.yajaman))
+    return {ok:false, msg:'ही फाईल या प्रणालीची बॅकअप फाईल नाही (देणगी / यजमान यादी सापडली नाही).'};
+  if(data.expenses!==undefined && !Array.isArray(data.expenses)) return {ok:false, msg:'बॅकअप फाईलमधील खर्च यादी चुकीची आहे.'};
+  for(let n=0;n<data.donations.length;n++){
+    const d=data.donations[n];
+    if(!d || typeof d!=='object' || !d.no || isNaN(Number(d.amount)))
+      return {ok:false, msg:'देणगी नोंद क्र. '+(n+1)+' मध्ये पावती क्रमांक किंवा रक्कम चुकीची आहे — फाईल खराब असू शकते.'};
+  }
+  for(let n=0;n<data.yajaman.length;n++){
+    if(!data.yajaman[n] || typeof data.yajaman[n]!=='object' || !data.yajaman[n].name)
+      return {ok:false, msg:'यजमान नोंद क्र. '+(n+1)+' मध्ये नाव नाही — फाईल खराब असू शकते.'};
+  }
+  return {ok:true, data};
+}
+function mergeBackupInto(cur, inc){
+  const added = {don:0, yaj:0, exp:0, skipped:0};
+  const idMap = {};
+  inc.yajaman.forEach(y=>{
+    const same = cur.yajaman.find(c=> (y.id && c.id===y.id && c.name===y.name) || (c.name===y.name && (c.mobile||'')===(y.mobile||'') && (c.village||'')===(y.village||'')));
+    if(same){ if(y.id) idMap[y.id]=same.id; return; }
+    const copy = JSON.parse(JSON.stringify(y));
+    if(!copy.id || cur.yajaman.some(c=>c.id===copy.id)){ const nid='YJ-'+String(cur.nextYajaman++).padStart(6,'0'); if(y.id) idMap[y.id]=nid; copy.id=nid; }
+    cur.yajaman.push(copy); added.yaj++;
+  });
+  inc.donations.forEach(d=>{
+    if(cur.donations.some(c=>c.no===d.no)){ added.skipped++; return; }
+    const copy = JSON.parse(JSON.stringify(d));
+    if(copy.yajamanId && idMap[copy.yajamanId]) copy.yajamanId = idMap[copy.yajamanId];
+    cur.donations.push(copy); added.don++;
+  });
+  (inc.expenses||[]).forEach(e=>{
+    if(cur.expenses.some(c=>c.no===e.no)){ added.skipped++; return; }
+    cur.expenses.push(JSON.parse(JSON.stringify(e))); added.exp++;
+  });
+  const maxNo = Math.max(0, ...cur.donations.map(d=>parseInt(d.no,10)||0));
+  cur.nextReceipt = Math.max(cur.nextReceipt||0, inc.nextReceipt||0, maxNo+1);
+  cur.nextYajaman = Math.max(cur.nextYajaman||1, inc.nextYajaman||1);
+  cur.nextExpense = Math.max(cur.nextExpense||1, inc.nextExpense||1);
+  return added;
+}
+function restoreBackupFile(input){
+  const file = input.files && input.files[0];
+  if(!file) return;
+  const mode = (document.querySelector('input[name="restoreMode"]:checked')||{}).value || 'merge';
+  const reader = new FileReader();
+  reader.onload = function(){
+    input.value = '';
+    let obj;
+    try{ obj = JSON.parse(reader.result); }catch(e){ showInfoModal('ही फाईल वाचता आली नाही — योग्य बॅकअप (.json) फाईल निवडा.'); return; }
+    const v = validateBackup(obj);
+    if(!v.ok){ showInfoModal(v.msg); return; }
+    const data = v.data;
+    const info = 'फाईलमध्ये '+data.donations.length+' देणगी नोंदी, '+data.yajaman.length+' यजमान, '+(data.expenses||[]).length+' खर्च नोंदी आहेत.\n';
+    const msg = mode==='replace'
+      ? info+'सध्याचा सर्व डेटा या फाईलने बदलला जाईल. (आधी सध्याच्या डेटाचा बॅकअप आपोआप डाउनलोड होईल.) पुढे जायचे का?'
+      : info+'फक्त नवीन नोंदी जोडल्या जातील; सध्याच्या नोंदी तशाच राहतील, तीच पावती दुबार होणार नाही. पुढे जायचे का?';
+    showConfirmModal(msg, function(){
+      try{
+        downloadBackupJSON(true);
+        if(mode==='replace'){
+          STORE = migrateStore(JSON.parse(JSON.stringify(data)));
+          STORE.meta = Object.assign({}, data.meta||{}, {lastBackup:(STORE.meta||{}).lastBackup});
+          persist(); refreshAll(); generateReport(); updateBackupInfo();
+          showInfoModal('✔ बॅकअप पुनर्संचयित झाला — '+STORE.donations.length+' देणगी नोंदी, '+STORE.yajaman.length+' यजमान.', 'ठीक आहे');
+        }else{
+          const r = mergeBackupInto(STORE, migrateStore(JSON.parse(JSON.stringify(data))));
+          persist(); refreshAll(); generateReport(); updateBackupInfo();
+          showInfoModal('✔ विलीन झाले — नवीन देणगी: '+r.don+', नवीन यजमान: '+r.yaj+', नवीन खर्च: '+r.exp+', आधीपासून असल्याने वगळलेल्या: '+r.skipped+'.', 'ठीक आहे');
+        }
+      }catch(e){ console.error(e); showInfoModal('पुनर्संचयित करताना अडचण आली — तुमचा डेटा बदललेला नाही असे तपासा. (' + e.message + ')'); }
+    }, {okLabel: mode==='replace' ? 'होय, बदला' : 'होय, जोडा'});
+  };
+  reader.onerror = function(){ showInfoModal('फाईल वाचताना अडचण आली.'); };
+  reader.readAsText(file);
 }
 </script>
 
