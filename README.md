@@ -27,7 +27,7 @@ Without internet the core app (entry, search, edit, cancel, print) still works; 
 - Donation entry: समर्थनार्थ, गोत्र, गाव/तालुका/जिल्हा/पिनकोड, मोबाईल १/२, full tithi list (आषाढ शु. नवमी → कार्तिक शु. पौर्णिमा), Cash / UPI / Cheque with reference no.
 - Two buttons: **जतन करा** (save) and **अंतिम करा व पावती** (save + final + open receipt)
 - Edit, print, PDF, **cancel (with reason) / restore** — donations are never hard-deleted; cancelled ones are excluded from all totals
-- Receipt: A4 sheet with the SAME receipt twice (office copy + donor copy, dashed cut line), header "श्री. सद्गुरू सखाराम महाराज विठ्ठल रुख्मणी संस्थान, अमळनेर जि. जळगाव" and "न्यास नोंद क्रमांक : अ /४६५/जळगाव" (editable in Settings), amount in numerals and Marathi words (अक्षरी), QR, "समाधी मंदिर" watermark, CANCELLED stamp. Print uses A4, 1 page.
+- Receipt: A4 sheet with the SAME receipt twice (office copy + donor copy, dashed cut line), header "श्री. सदगुरू सखाराम महाराज विठ्ठल रुख्मणी संस्थान, अमळनेर जि. जळगाव" and "न्यास नोंद क्रमांक : अ /४६५/जळगाव" (editable in Settings), amount in numerals and Marathi words (अक्षरी), QR, "समाधी मंदिर" watermark, CANCELLED stamp. Print uses A4, 1 page.
 - Yajaman profile with monthly / yearly / all history filter, A4 ledger
 - **स्मरणपत्र** (reminder letter) per yajaman with pledge / paid / due, amount in Marathi words and bank details (Settings → बँक तपशील)
 - Reports from 2021: monthly / yearly / all, date-wise and tithi-wise summaries, Excel / PDF
@@ -51,3 +51,8 @@ sansthan-app/
 
 ## Not built yet
 Cash book detail, activity/audit log, thermal-printer receipt size, family/group yajaman, yajaman ID cards.
+
+## Latest changes
+- Dashboard shows the Maharaj photo + official name "श्री सदगुरू सखाराम महाराज विठ्ठल रुख्मणी संस्थान, अमळनेर / पंढरपूर" (photo also on every receipt).
+- Marathi typing: forms are plain Unicode inputs by default (Google Input Tools, Windows Marathi keyboard, paste all work; Ctrl+V no longer blocked). Optional built-in English→Marathi typing via the checkbox on the form.
+- Donation form: "जुना यजमान शोधा" – type part of name / mobile / ID, pick from the list; no manual ID typing.
